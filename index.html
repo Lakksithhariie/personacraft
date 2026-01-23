@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>personacraft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Barlow', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#faf5fa',
+                            100: '#f6edf6',
+                            200: '#eedcee',
+                            300: '#e1c0e0',
+                            400: '#cd99ca',
+                            500: '#bc7bb7',
+                            600: '#a55d9c',
+                            700: '#8c4a81',
+                            800: '#753f6c',
+                            900: '#63385b',
+                            950: '#3a1d34',
+                        },
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #faf5fa;
+            color: #753f6c;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection {
+            background-color: #eedcee;
+            color: #63385b;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
