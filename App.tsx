@@ -114,18 +114,18 @@ const App: React.FC = () => {
   const modKey = isMac ? '⌘' : 'ctrl';
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans pattern-bg">
       <Header onOpenShortcuts={() => setShowShortcuts(true)} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-12 flex flex-col gap-12">
         {/* Hero Section */}
         <section className="text-center space-y-4">
           <h2 className="text-4xl sm:text-5xl font-bold text-brand-900 leading-tight lowercase">
-            transform your text <br className="hidden sm:block" /> instantly
+            rephrase anything <br className="hidden sm:block" /> in any voice
           </h2>
           <p className="text-brand-600 max-w-xl mx-auto font-medium lowercase">
-            sound professional, channel a character, or simplify complex ideas with ai.
-            select a style and watch the magic happen.
+            fix grammar, change tone, or channel famous personas — instantly.
+            ai-powered writing that sounds like a native speaker wrote it.
           </p>
         </section>
 

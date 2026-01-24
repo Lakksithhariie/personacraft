@@ -3,10 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>personacraft</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>personacraft — ai-powered text rephrasing & tone transformation</title>
+    <meta name="description" content="transform your writing instantly with ai. rephrase text in any tone, impersonate famous personas, fix grammar, and sound like a native speaker. free online tool powered by groq.">
+    <meta name="keywords" content="ai writing tool, text rephraser, tone changer, grammar checker, paraphrasing tool, writing assistant, grammarly alternative, ai editor, text transformer">
+    <meta name="author" content="personacraft">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://personacraft.app/">
+    <meta property="og:title" content="personacraft — ai-powered text rephrasing & tone transformation">
+    <meta property="og:description" content="transform your writing instantly. rephrase text in any tone, impersonate famous personas, and sound like a native speaker.">
+    <meta property="og:image" content="/og-image.png">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://personacraft.app/">
+    <meta name="twitter:title" content="personacraft — ai text rephrasing tool">
+    <meta name="twitter:description" content="transform your writing instantly. rephrase text in any tone, impersonate famous personas, and sound like a native speaker.">
+    <meta name="twitter:image" content="/og-image.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://personacraft.app/">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#ff530f">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,13 +74,46 @@
             color: #9e1f0e;
             -webkit-font-smoothing: antialiased;
         }
+        
+        /* SVG Pattern Background */
+        .pattern-bg {
+            background-color: #fff5ec;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M5,5 l2,0 l0,2 l-2,0 l0,-2 M0,0 l1,0 l0,1 l-1,0 l0,-1 M11,0 l1,0 l0,1 l-1,0 l0,-1 M0,11 l1,0 l0,1 l-1,0 l0,-1 M11,11 l1,0 l0,1 l-1,0 l0,-1' fill='%23ffcca8'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+        }
+        
         ::selection {
             background-color: #ffcca8;
             color: #7f1d0f;
         }
     </style>
+    
+    <!-- Structured Data / JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "personacraft",
+        "description": "ai-powered text rephrasing and tone transformation tool",
+        "url": "https://personacraft.app",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "text rephrasing",
+            "tone transformation", 
+            "grammar correction",
+            "persona impersonation",
+            "native speaker quality"
+        ]
+    }
+    </script>
 </head>
-<body>
+<body class="pattern-bg">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
 </body>
