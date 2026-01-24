@@ -1,10 +1,11 @@
-import { Tone, Persona, RephraseResponse, Model } from "../types";
+import { Voice, Persona, RephraseResponse, Model } from "../types";
 
 export const rephraseText = async (
   text: string,
-  selection: Tone | Persona,
+  selection: Voice | Persona,
   isPersona: boolean,
-  model: Model
+  model: Model,
+  variationCount: number = 1
 ): Promise<RephraseResponse> => {
   const apiKey = process.env.GROQ_API_KEY;
 
@@ -13,6 +14,10 @@ export const rephraseText = async (
   }
 
   const systemPrompt = selection.prompt;
+  
+  const userPrompt = variationCount > 1 
+    ? `provide exactly ${variationCount} different variations of the rephrased text. separate each variation with "---" on its own line. each variation should be distinct but follow the same voice and rules.\n\ntext to rephrase:\n${text}`
+    : text;
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -25,10 +30,10 @@ export const rephraseText = async (
         model: model.id,
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: text }
+          { role: "user", content: userPrompt }
         ],
-        temperature: isPersona ? 0.7 : 0.3,
-        max_tokens: 1000,
+        temperature: isPersona ? 0.7 : 0.4,
+        max_tokens: variationCount * 500,
       }),
     });
 
@@ -43,19 +48,43 @@ export const rephraseText = async (
     const data = await response.json();
     const result = data.choices?.[0]?.message?.content || "";
 
-    // Clean up any quotes, asterisks, or markdown the model might add
-    const cleanedResult = result
-      .trim()
-      .replace(/^["']|["']$/g, '')
-      .replace(/^\*\*|\*\*$/g, '')
-      .replace(/^#+\s*/gm, '')
-      .replace(/\*\*/g, '');
+    // Clean and split variations
+    const cleanResult = (text: string): string => {
+      return text
+        .trim()
+        .replace(/^["']|["']$/g, '')
+        .replace(/^\*\*|\*\*$/g, '')
+        .replace(/^#+\s*/gm, '')
+        .replace(/\*\*/g, '')
+        .replace(/—/g, ' ')
+        .replace(/–/g, ' ')
+        .replace(/:/g, ',')
+        .replace(/;/g, '.')
+        .trim();
+    };
+
+    let results: string[];
+    
+    if (variationCount > 1) {
+      results = result
+        .split('---')
+        .map((v: string) => cleanResult(v))
+        .filter((v: string) => v.length > 0)
+        .slice(0, variationCount);
+      
+      // If splitting didn't work well, just return the whole thing as one
+      if (results.length === 0) {
+        results = [cleanResult(result)];
+      }
+    } else {
+      results = [cleanResult(result)];
+    }
 
     return {
-      result: cleanedResult,
+      results,
       meta: {
         model: model.name,
-        wordCount: cleanedResult.split(/\s+/).filter(Boolean).length,
+        variationCount: results.length,
         originalWordCount: text.split(/\s+/).filter(Boolean).length,
       },
     };

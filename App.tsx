@@ -4,26 +4,27 @@ import TextArea from './components/TextArea';
 import SelectionGrid from './components/SelectionGrid';
 import OutputSection from './components/OutputSection';
 import ShortcutsModal from './components/ShortcutsModal';
-import { TONES, PERSONAS, MODELS, MAX_CHARS } from './constants';
-import { Tone, Persona, RephraseResponse, Model } from './types';
+import { VOICES, PERSONAS, MODELS, MAX_CHARS, MIN_VARIATIONS, MAX_VARIATIONS } from './constants';
+import { Voice, Persona, RephraseResponse, Model } from './types';
 import { rephraseText } from './services/groqService';
 
 const App: React.FC = () => {
   // State
   const [inputText, setInputText] = useState('');
-  const [selectedToneId, setSelectedToneId] = useState<string | null>(null);
+  const [selectedVoiceId, setSelectedVoiceId] = useState<string | null>(null);
   const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null);
   const [selectedModelId, setSelectedModelId] = useState<string>(MODELS[0].id);
+  const [variationCount, setVariationCount] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<RephraseResponse | null>(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
 
   // Derived state
-  const selectedTone = TONES.find(t => t.id === selectedToneId);
+  const selectedVoice = VOICES.find(v => v.id === selectedVoiceId);
   const selectedPersona = PERSONAS.find(p => p.id === selectedPersonaId);
   const selectedModel = MODELS.find(m => m.id === selectedModelId)!;
-  const activeSelection = selectedTone || selectedPersona;
+  const activeSelection = selectedVoice || selectedPersona;
   const isPersona = !!selectedPersona;
 
   const outputRef = useRef<HTMLDivElement>(null);
@@ -35,7 +36,7 @@ const App: React.FC = () => {
       return;
     }
     if (!activeSelection) {
-      setError('please select a tone or a persona.');
+      setError('please select a voice or a persona.');
       return;
     }
     if (inputText.length > MAX_CHARS) {
@@ -48,7 +49,7 @@ const App: React.FC = () => {
     setResponse(null);
 
     try {
-      const res = await rephraseText(inputText, activeSelection, isPersona, selectedModel);
+      const res = await rephraseText(inputText, activeSelection, isPersona, selectedModel, variationCount);
       setResponse(res);
       setTimeout(() => {
         outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -58,7 +59,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [inputText, activeSelection, isPersona, selectedModel]);
+  }, [inputText, activeSelection, isPersona, selectedModel, variationCount]);
 
   const handleClear = () => {
     setInputText('');
@@ -66,21 +67,22 @@ const App: React.FC = () => {
     setError(null);
   };
 
-  const handleToneSelect = (id: string) => {
-    setSelectedToneId(id === selectedToneId ? null : id);
+  const handleVoiceSelect = (id: string) => {
+    setSelectedVoiceId(id === selectedVoiceId ? null : id);
     setSelectedPersonaId(null);
     setError(null);
   };
 
   const handlePersonaSelect = (id: string) => {
     setSelectedPersonaId(id === selectedPersonaId ? null : id);
-    setSelectedToneId(null);
+    setSelectedVoiceId(null);
     setError(null);
   };
 
-  const handleCopyResult = async () => {
-    if (response?.result) {
-      await navigator.clipboard.writeText(response.result);
+  const handleCopyResult = async (text?: string) => {
+    const textToCopy = text || response?.results[0];
+    if (textToCopy) {
+      await navigator.clipboard.writeText(textToCopy);
     }
   };
 
@@ -121,11 +123,11 @@ const App: React.FC = () => {
         {/* Hero Section */}
         <section className="text-center space-y-4">
           <h2 className="text-4xl sm:text-5xl font-bold text-brand-900 leading-tight lowercase">
-            rephrase anything <br className="hidden sm:block" /> in any voice
+            rephrase in any voice
           </h2>
           <p className="text-brand-600 max-w-xl mx-auto font-medium lowercase">
-            fix grammar, change tone, or channel famous personas — instantly.
-            ai-powered writing that sounds like a native speaker wrote it.
+            fix grammar and rephrase your text in different voices.
+            sound like a data analyst, product manager, or famous persona.
           </p>
         </section>
 
@@ -144,17 +146,18 @@ const App: React.FC = () => {
             isLoading={isLoading}
             label={activeSelection?.name || ''}
             onRegenerate={handleRephrase}
+            onCopy={handleCopyResult}
           />
         </div>
 
-        {/* 3. Tone Grid */}
+        {/* 3. Voice Grid */}
         <SelectionGrid
-          title="choose a tone"
-          subtitle="how should your message sound?"
-          items={TONES}
-          selectedId={selectedToneId}
-          onSelect={handleToneSelect}
-          renderItem={(tone, isSelected) => (
+          title="choose a voice"
+          subtitle="how should your text sound?"
+          items={VOICES}
+          selectedId={selectedVoiceId}
+          onSelect={handleVoiceSelect}
+          renderItem={(voice, isSelected) => (
             <button
               className={`w-full group p-4 border-2 transition-all flex flex-col items-center gap-2 text-center
               ${isSelected
@@ -164,10 +167,10 @@ const App: React.FC = () => {
             >
               <div className="flex flex-col">
                 <span className={`text-xs font-semibold lowercase ${isSelected ? 'text-brand-900' : 'text-brand-700'}`}>
-                  {tone.name}
+                  {voice.name}
                 </span>
                 <span className="text-[10px] text-brand-500 leading-tight lowercase hidden sm:block">
-                  {tone.description}
+                  {voice.description}
                 </span>
               </div>
             </button>
@@ -229,7 +232,30 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* 6. Primary Action Button */}
+        {/* 6. Variations Selector */}
+        <section className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            <h2 className="text-sm font-semibold text-brand-900 lowercase tracking-wider">output variations</h2>
+            <p className="text-xs text-brand-500 lowercase">how many different versions do you want?</p>
+          </div>
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5].map((num) => (
+              <button
+                key={num}
+                onClick={() => setVariationCount(num)}
+                className={`w-12 h-12 border-2 transition-all flex items-center justify-center font-bold
+                  ${variationCount === num
+                    ? 'bg-brand-200 border-brand-500 ring-2 ring-brand-500 ring-offset-2 text-brand-900'
+                    : 'bg-brand-50 border-brand-200 hover:bg-brand-100 hover:border-brand-300 text-brand-700'
+                  }`}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* 7. Primary Action Button */}
         <div className="flex flex-col gap-4 sticky bottom-8 z-30">
           {error && (
             <div className="bg-red-50 border-2 border-red-500 p-4 text-red-800 text-sm font-semibold flex items-center gap-3 lowercase">

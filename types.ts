@@ -1,4 +1,4 @@
-export interface Tone {
+export interface Voice {
   id: string;
   name: string;
   description: string;
@@ -19,10 +19,10 @@ export interface Model {
 }
 
 export interface RephraseResponse {
-  result: string;
+  results: string[];
   meta: {
     model: string;
-    wordCount: number;
+    variationCount: number;
     originalWordCount: number;
   };
 }
