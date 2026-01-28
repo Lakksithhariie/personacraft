@@ -1,37 +1,61 @@
-import React from 'react';
+import React from "react";
 
-interface SelectionGridProps<T> {
+type IdLike = string;
+type Identifiable = { id: IdLike };
+
+type SelectionGridProps<T extends Identifiable> = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   items: T[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
+  selectedId: IdLike | null;
+  onSelect: (id: IdLike) => void;
   renderItem: (item: T, isSelected: boolean) => React.ReactNode;
-}
+  className?: string;
+  gridClassName?: string;
+};
 
-const SelectionGrid = <T extends { id: string },>({
+export default function SelectionGrid<T extends Identifiable>({
   title,
   subtitle,
   items,
   selectedId,
   onSelect,
-  renderItem
-}: SelectionGridProps<T>) => {
+  renderItem,
+  className = "",
+  gridClassName = "grid grid-cols-2 sm:grid-cols-5 gap-2",
+}: SelectionGridProps<T>) {
   return (
-    <section className="flex flex-col gap-4">
+    <section className={`flex flex-col gap-4 ${className}`}>
       <div className="flex flex-col">
-        <h2 className="text-sm font-semibold text-brand-900 lowercase tracking-wider">{title}</h2>
-        <p className="text-xs text-brand-500 lowercase">{subtitle}</p>
+        <h2 className="text-sm font-semibold text-brand-900 lowercase tracking-wider">
+          {title}
+        </h2>
+        {subtitle && (
+          <p className="text-xs text-brand-500 lowercase">{subtitle}</p>
+        )}
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-        {items.map((item) => (
-          <div key={item.id} onClick={() => onSelect(item.id)}>
-            {renderItem(item, selectedId === item.id)}
-          </div>
-        ))}
+
+      <div className={gridClassName}>
+        {items.map((item) => {
+          const isSelected = item.id === selectedId;
+          return (
+            <div
+              key={item.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => onSelect(item.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelect(item.id);
+                }
+              }}
+            >
+              {renderItem(item, isSelected)}
+            </div>
+          );
+        })}
       </div>
     </section>
   );
-};
-
-export default SelectionGrid;
+}
