@@ -3,117 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personacraft — AI Writing Assistant</title>
     
-    <!-- SEO Meta Tags -->
-    <title>personacraft — ai-powered text rephrasing & tone transformation</title>
-    <meta name="description" content="transform your writing instantly with ai. rephrase text in any tone, impersonate famous personas, fix grammar, and sound like a native speaker. free online tool powered by groq.">
-    <meta name="keywords" content="ai writing tool, text rephraser, tone changer, grammar checker, paraphrasing tool, writing assistant, grammarly alternative, ai editor, text transformer">
-    <meta name="author" content="personacraft">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://personacraft.app/">
-    <meta property="og:title" content="personacraft — ai-powered text rephrasing & tone transformation">
-    <meta property="og:description" content="transform your writing instantly. rephrase text in any tone, impersonate famous personas, and sound like a native speaker.">
-    <meta property="og:image" content="/og-image.png">
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://personacraft.app/">
-    <meta name="twitter:title" content="personacraft — ai text rephrasing tool">
-    <meta name="twitter:description" content="transform your writing instantly. rephrase text in any tone, impersonate famous personas, and sound like a native speaker.">
-    <meta name="twitter:image" content="/og-image.png">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://personacraft.app/">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#ff530f">
-    
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              // Primary - Lime Green
+              lime: {
+                50: '#fefff0',
+                100: '#fcffd6',
+                200: '#f5ff99',
+                300: '#e8ff4d',
+                400: '#d5ff00',
+                500: '#c4eb00',
+                600: '#9fbe00',
+                700: '#778f00',
+                800: '#5c6f00',
+                900: '#3d4a00',
+                950: '#1f2500',
+              },
+              // Secondary - Teal
+              teal: {
+                50: '#e6f7f5',
+                100: '#b3e8e3',
+                200: '#80d9d0',
+                300: '#4dcabd',
+                400: '#1abba9',
+                500: '#027e6f',
+                600: '#026b5e',
+                700: '#02584e',
+                800: '#01453d',
+                900: '#01322c',
+                950: '#001f1c',
+              },
+              // Accent - Indigo
+              indigo: {
+                50: '#eeeaff',
+                100: '#d4cbff',
+                200: '#a897ff',
+                300: '#7c63ff',
+                400: '#5030ff',
+                500: '#1b0d6f',
+                600: '#180c63',
+                700: '#140a52',
+                800: '#100842',
+                900: '#0c0631',
+                950: '#080421',
+              },
+              // Neutral - Navy
+              navy: {
+                50: '#f4f5f7',
+                100: '#e4e6eb',
+                200: '#c9cdd7',
+                300: '#9ea5b5',
+                400: '#6b7489',
+                500: '#4a5568',
+                600: '#3d4559',
+                700: '#2d3448',
+                800: '#1f243c',
+                900: '#181c2e',
+                950: '#0f1220',
+              },
+            },
+            fontFamily: {
+              sans: ['Outfit', 'system-ui', 'sans-serif'],
+              display: ['Libre Franklin', 'system-ui', 'sans-serif'],
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.3s ease-out',
+              'slide-up': 'slideUp 0.4s ease-out',
+              'confetti-fall': 'confettiFall 3s ease-out forwards',
+              'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              confettiFall: {
+                '0%': { transform: 'translateY(-100%) rotate(0deg)', opacity: '1' },
+                '100%': { transform: 'translateY(100vh) rotate(720deg)', opacity: '0' },
+              },
+              pulseSoft: {
+                '0%, 100%': { opacity: '1' },
+                '50%': { opacity: '0.6' },
+              },
+            },
+          },
+        },
+      }
+    </script>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Barlow', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#fff5ec',
-                            100: '#ffe7d4',
-                            200: '#ffcca8',
-                            300: '#ffa770',
-                            400: '#ff7736',
-                            500: '#ff530f',
-                            600: '#dd3305',
-                            700: '#c72607',
-                            800: '#9e1f0e',
-                            900: '#7f1d0f',
-                            950: '#450b05',
-                        },
-                    },
-                    animation: {
-                        'spin-slow': 'spin 3s linear infinite',
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            background-color: #fff5ec;
-            color: #9e1f0e;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        /* SVG Pattern Background */
-        .pattern-bg {
-            background-color: #fff5ec;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M5,5 l2,0 l0,2 l-2,0 l0,-2 M0,0 l1,0 l0,1 l-1,0 l0,-1 M11,0 l1,0 l0,1 l-1,0 l0,-1 M0,11 l1,0 l0,1 l-1,0 l0,-1 M11,11 l1,0 l0,1 l-1,0 l0,-1' fill='%23ffcca8'/%3E%3C/svg%3E");
-            background-repeat: repeat;
-        }
-        
-        ::selection {
-            background-color: #ffcca8;
-            color: #7f1d0f;
-        }
+      * {
+        font-family: 'Outfit', system-ui, sans-serif;
+      }
+      
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Libre Franklin', system-ui, sans-serif;
+      }
+      
+      /* ========== LIGHT MODE ========== */
+      body {
+        background-color: #ffffff;
+        color: #1f243c;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      
+      /* ========== DARK MODE ========== */
+      .dark body,
+      .dark {
+        background-color: #1f243c;
+        color: #f4f5f7;
+      }
+      
+      /* ========== FLAT CARD - LIGHT ========== */
+      .card {
+        background-color: #ffffff;
+        border: 1px solid #e4e6eb;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+      }
+      
+      .dark .card {
+        background-color: #2d3448;
+        border-color: #3d4559;
+      }
+      
+      .card-accent {
+        background-color: #ffffff;
+        border: 2px solid #027e6f;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+      }
+      
+      .dark .card-accent {
+        background-color: #2d3448;
+        border-color: #027e6f;
+      }
+      
+      /* ========== PRIMARY BUTTON ========== */
+      .btn-primary {
+        background-color: #d5ff00;
+        color: #1f243c;
+        font-weight: 600;
+        border: none;
+        transition: all 0.2s ease;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background-color: #c4eb00;
+        transform: translateY(-1px);
+      }
+      .btn-primary:active:not(:disabled) {
+        transform: translateY(0);
+      }
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+      
+      /* ========== SECONDARY BUTTON ========== */
+      .btn-secondary {
+        background-color: transparent;
+        color: #1f243c;
+        border: 1px solid #c9cdd7;
+        transition: all 0.2s ease;
+      }
+      .btn-secondary:hover {
+        border-color: #027e6f;
+        color: #027e6f;
+      }
+      .dark .btn-secondary {
+        color: #e4e6eb;
+        border-color: #4a5568;
+      }
+      .dark .btn-secondary:hover {
+        border-color: #d5ff00;
+        color: #d5ff00;
+      }
+      
+      /* ========== INPUT ========== */
+      .input-field {
+        background-color: #ffffff;
+        border: 1px solid #e4e6eb;
+        color: #1f243c;
+        transition: all 0.2s ease;
+      }
+      .input-field:focus {
+        border-color: #027e6f;
+        outline: 2px solid rgba(2, 126, 111, 0.2);
+        outline-offset: 0;
+      }
+      .input-field::placeholder {
+        color: #9ea5b5;
+      }
+      .dark .input-field {
+        background-color: #2d3448;
+        border-color: #4a5568;
+        color: #f4f5f7;
+      }
+      .dark .input-field:focus {
+        border-color: #d5ff00;
+        outline-color: rgba(213, 255, 0, 0.2);
+      }
+      .dark .input-field::placeholder {
+        color: #6b7489;
+      }
+      
+      /* ========== SCROLLBAR ========== */
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { 
+        background: #c9cdd7; 
+        border-radius: 3px; 
+      }
+      ::-webkit-scrollbar-thumb:hover { background: #9ea5b5; }
+      .dark ::-webkit-scrollbar-thumb { background: #4a5568; }
+      .dark ::-webkit-scrollbar-thumb:hover { background: #6b7489; }
+      
+      /* ========== SELECTION ========== */
+      ::selection {
+        background: rgba(213, 255, 0, 0.3);
+        color: #1f243c;
+      }
+      .dark ::selection {
+        background: rgba(213, 255, 0, 0.3);
+        color: #ffffff;
+      }
+      
+      /* ========== CONFETTI ========== */
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        border-radius: 2px;
+        animation: confettiFall 3s ease-out forwards;
+        z-index: 100;
+        pointer-events: none;
+      }
+      
+      /* ========== TYPEWRITER ========== */
+      .typewriter-cursor {
+        display: inline-block;
+        width: 2px;
+        height: 1.2em;
+        background: #027e6f;
+        margin-left: 2px;
+        animation: blink 0.8s infinite;
+      }
+      .dark .typewriter-cursor {
+        background: #d5ff00;
+      }
+      @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+      
+      /* ========== TOGGLE ========== */
+      .toggle-track {
+        background-color: #e4e6eb;
+        transition: background-color 0.2s ease;
+      }
+      .toggle-track.active {
+        background-color: #027e6f;
+      }
+      .dark .toggle-track {
+        background-color: #4a5568;
+      }
+      .dark .toggle-track.active {
+        background-color: #d5ff00;
+      }
     </style>
     
-    <!-- Structured Data / JSON-LD -->
-    <script type="application/ld+json">
+    <script type="importmap">
     {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "personacraft",
-        "description": "ai-powered text rephrasing and tone transformation tool",
-        "url": "https://personacraft.app",
-        "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "Any",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "featureList": [
-            "text rephrasing",
-            "tone transformation", 
-            "grammar correction",
-            "persona impersonation",
-            "native speaker quality"
-        ]
+      "imports": {
+        "react/": "https://esm.sh/react@^19.2.4/",
+        "react": "https://esm.sh/react@^19.2.4",
+        "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+        "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+      }
     }
     </script>
+    <link rel="stylesheet" href="/index.css">
 </head>
-<body class="pattern-bg">
+<body class="min-h-screen antialiased">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
 </body>
