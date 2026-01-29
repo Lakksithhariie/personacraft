@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personacraft — AI Writing Assistant</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="Transform your writing with AI-powered precision and style. Professional rewriting with multiple modes and variations.">
+    <meta name="theme-color" content="#1f243c" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Personacraft — AI Writing Assistant">
+    <meta property="og:description" content="Transform your writing with AI-powered precision and style.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/favicon.svg">
+    
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,7 +28,6 @@
         theme: {
           extend: {
             colors: {
-              // Primary - Lime Green
               lime: {
                 50: '#fefff0',
                 100: '#fcffd6',
@@ -27,7 +41,6 @@
                 900: '#3d4a00',
                 950: '#1f2500',
               },
-              // Secondary - Teal
               teal: {
                 50: '#e6f7f5',
                 100: '#b3e8e3',
@@ -41,7 +54,6 @@
                 900: '#01322c',
                 950: '#001f1c',
               },
-              // Accent - Indigo
               indigo: {
                 50: '#eeeaff',
                 100: '#d4cbff',
@@ -55,7 +67,6 @@
                 900: '#0c0631',
                 950: '#080421',
               },
-              // Neutral - Navy
               navy: {
                 50: '#f4f5f7',
                 100: '#e4e6eb',
@@ -117,21 +128,18 @@
         font-family: 'Libre Franklin', system-ui, sans-serif;
       }
       
-      /* ========== LIGHT MODE ========== */
       body {
         background-color: #ffffff;
         color: #1f243c;
         transition: background-color 0.3s ease, color 0.3s ease;
       }
       
-      /* ========== DARK MODE ========== */
       .dark body,
       .dark {
         background-color: #1f243c;
         color: #f4f5f7;
       }
       
-      /* ========== FLAT CARD - LIGHT ========== */
       .card {
         background-color: #ffffff;
         border: 1px solid #e4e6eb;
@@ -156,7 +164,6 @@
         border-color: #027e6f;
       }
       
-      /* ========== PRIMARY BUTTON ========== */
       .btn-primary {
         background-color: #d5ff00;
         color: #1f243c;
@@ -177,7 +184,6 @@
         transform: none;
       }
       
-      /* ========== SECONDARY BUTTON ========== */
       .btn-secondary {
         background-color: transparent;
         color: #1f243c;
@@ -197,7 +203,6 @@
         color: #d5ff00;
       }
       
-      /* ========== INPUT ========== */
       .input-field {
         background-color: #ffffff;
         border: 1px solid #e4e6eb;
@@ -225,7 +230,6 @@
         color: #6b7489;
       }
       
-      /* ========== SCROLLBAR ========== */
       ::-webkit-scrollbar { width: 6px; height: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { 
@@ -236,7 +240,6 @@
       .dark ::-webkit-scrollbar-thumb { background: #4a5568; }
       .dark ::-webkit-scrollbar-thumb:hover { background: #6b7489; }
       
-      /* ========== SELECTION ========== */
       ::selection {
         background: rgba(213, 255, 0, 0.3);
         color: #1f243c;
@@ -246,7 +249,6 @@
         color: #ffffff;
       }
       
-      /* ========== CONFETTI ========== */
       .confetti {
         position: fixed;
         width: 10px;
@@ -258,7 +260,6 @@
         pointer-events: none;
       }
       
-      /* ========== TYPEWRITER ========== */
       .typewriter-cursor {
         display: inline-block;
         width: 2px;
@@ -275,7 +276,6 @@
         51%, 100% { opacity: 0; }
       }
       
-      /* ========== TOGGLE ========== */
       .toggle-track {
         background-color: #e4e6eb;
         transition: background-color 0.2s ease;
