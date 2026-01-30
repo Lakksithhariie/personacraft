@@ -58,7 +58,7 @@ function useTheme() {
 // ============================================
 function Confetti({ count = 50 }: { count?: number }) {
   const colors = ['#d5ff00', '#027e6f', '#1b0d6f', '#4dcabd', '#c4eb00'];
-  
+
   const pieces = Array.from({ length: count }, (_, i) => ({
     id: i,
     style: {
@@ -72,7 +72,9 @@ function Confetti({ count = 50 }: { count?: number }) {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-50">
-      {pieces.map((p) => <div key={p.id} className="confetti" style={p.style} />)}
+      {pieces.map((p) => (
+        <div key={p.id} className="confetti" style={p.style} />
+      ))}
     </div>
   );
 }
@@ -157,10 +159,13 @@ export default function App() {
 
   const notify = useCallback((msg: string) => setToast(msg), []);
 
-  const copy = useCallback((text: string) => {
-    navigator.clipboard.writeText(text);
-    notify('Copied to clipboard!');
-  }, [notify]);
+  const copy = useCallback(
+    (text: string) => {
+      navigator.clipboard.writeText(text);
+      notify('Copied to clipboard!');
+    },
+    [notify]
+  );
 
   const clear = useCallback(() => {
     setInputText('');
@@ -189,7 +194,13 @@ export default function App() {
     setTypewriter(false);
 
     try {
-      const res = await rephraseText({ text: inputText, mode, model, variationCount, controls });
+      const res = await rephraseText({
+        text: inputText,
+        mode,
+        model,
+        variationCount,
+        controls,
+      });
       setResult(res);
       setSelectedIdx(0);
       setTypewriter(true);
@@ -206,18 +217,57 @@ export default function App() {
     }
   }, [inputText, mode, model, variationCount, controls, firstSuccess]);
 
+  // ============================================
+  // KEYBOARD SHORTCUTS - FIXED
+  // ============================================
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); transform(); }
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'x') { e.preventDefault(); clear(); }
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'c') { e.preventDefault(); copyPrimary(); }
-      if (e.key === '?' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); setShortcutsOpen(true); }
+      // Check if user is typing in an input field
+      const target = e.target as HTMLElement;
+      const isTyping =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable;
+
+      // Mod + Enter to Transform (works even when typing)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        transform();
+      }
+
+      // Mod + Shift + X to Clear (works even when typing)
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'x') {
+        e.preventDefault();
+        clear();
+      }
+
+      // Mod + Shift + C to Copy Primary (works even when typing)
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        copyPrimary();
+      }
+
+      // ? opens shortcuts modal - ONLY when NOT typing
+      if (e.key === '?' && !e.metaKey && !e.ctrlKey && !isTyping) {
+        e.preventDefault();
+        setShortcutsOpen(true);
+      }
+
+      // Escape closes modal
+      if (e.key === 'Escape' && shortcutsOpen) {
+        e.preventDefault();
+        setShortcutsOpen(false);
+      }
     };
+
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [transform, clear, copyPrimary]);
+  }, [transform, clear, copyPrimary, shortcutsOpen]);
 
-  useEffect(() => { if (result) setTypewriter(true); }, [selectedIdx]);
+  useEffect(() => {
+    if (result) setTypewriter(true);
+  }, [selectedIdx]);
 
   const charPct = Math.min((inputText.length / MAX_CHARS) * 100, 100);
   const overLimit = inputText.length > MAX_CHARS;
@@ -236,28 +286,56 @@ export default function App() {
                 <Sparkles size={20} className="text-navy-800" />
               </div>
               <div>
-                <h1 className="font-display text-xl font-bold text-navy-800 dark:text-white">Personacraft</h1>
-                <p className="text-[10px] text-navy-500 dark:text-navy-400 -mt-0.5">AI Writing Assistant</p>
+                <h1 className="font-display text-xl font-bold text-navy-800 dark:text-white">
+                  Personacraft
+                </h1>
+                <p className="text-[10px] text-navy-500 dark:text-navy-400 -mt-0.5">
+                  AI Writing Assistant
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-1">
-              <button onClick={toggleTheme} className="p-2.5 text-navy-600 dark:text-navy-300 hover:bg-navy-100 dark:hover:bg-navy-700 rounded-xl transition-colors" title="Toggle theme">
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 text-navy-600 dark:text-navy-300 hover:bg-navy-100 dark:hover:bg-navy-700 rounded-xl transition-colors"
+                title="Toggle theme"
+              >
                 {isDark ? <Sun size={18} /> : <Moon size={18} />}
               </button>
-              <button onClick={() => setShortcutsOpen(true)} className="p-2.5 text-navy-600 dark:text-navy-300 hover:bg-navy-100 dark:hover:bg-navy-700 rounded-xl transition-colors" title="Shortcuts">
+              <button
+                onClick={() => setShortcutsOpen(true)}
+                className="p-2.5 text-navy-600 dark:text-navy-300 hover:bg-navy-100 dark:hover:bg-navy-700 rounded-xl transition-colors"
+                title="Shortcuts"
+              >
                 <Keyboard size={18} />
               </button>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="p-2.5 text-navy-600 dark:text-navy-300 hover:bg-navy-100 dark:hover:bg-navy-700 rounded-xl transition-colors">
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 text-navy-600 dark:text-navy-300 hover:bg-navy-100 dark:hover:bg-navy-700 rounded-xl transition-colors"
+              >
                 <Github size={18} />
               </a>
               <div className="w-px h-6 bg-navy-200 dark:bg-navy-600 mx-2" />
-              <button onClick={clear} className="btn-secondary flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium">
+              <button
+                onClick={clear}
+                className="btn-secondary flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium"
+              >
                 <Trash2 size={16} />
                 <span className="hidden sm:inline">Clear</span>
               </button>
-              <button onClick={transform} disabled={loading || !inputText.trim()} className="btn-primary flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm">
-                {loading ? <div className="w-4 h-4 border-2 border-navy-800/30 border-t-navy-800 rounded-full animate-spin" /> : <Sparkles size={16} />}
+              <button
+                onClick={transform}
+                disabled={loading || !inputText.trim()}
+                className="btn-primary flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm"
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-navy-800/30 border-t-navy-800 rounded-full animate-spin" />
+                ) : (
+                  <Sparkles size={16} />
+                )}
                 <span className="font-semibold">{result ? 'Regenerate' : 'Transform'}</span>
               </button>
             </div>
@@ -268,23 +346,32 @@ export default function App() {
       {/* MAIN */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
           {/* LEFT */}
           <div className="lg:col-span-5 space-y-5">
-
             {/* INPUT */}
             <section className="card overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-navy-200 dark:border-navy-600 bg-navy-50 dark:bg-navy-700/50">
                 <div className="flex items-center gap-2">
                   <FileText size={14} className="text-teal-500" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-navy-600 dark:text-navy-300">Input Text</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-navy-600 dark:text-navy-300">
+                    Input Text
+                  </span>
                 </div>
-                <span className={`text-xs font-medium ${overLimit ? 'text-red-500' : 'text-navy-500 dark:text-navy-400'}`}>
+                <span
+                  className={`text-xs font-medium ${
+                    overLimit ? 'text-red-500' : 'text-navy-500 dark:text-navy-400'
+                  }`}
+                >
                   {inputText.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
                 </span>
               </div>
               <div className="h-1 bg-navy-100 dark:bg-navy-700">
-                <div className={`h-full transition-all duration-300 ${overLimit ? 'bg-red-500' : 'bg-teal-500'}`} style={{ width: `${charPct}%` }} />
+                <div
+                  className={`h-full transition-all duration-300 ${
+                    overLimit ? 'bg-red-500' : 'bg-teal-500'
+                  }`}
+                  style={{ width: `${charPct}%` }}
+                />
               </div>
               <textarea
                 value={inputText}
@@ -302,41 +389,99 @@ export default function App() {
 
             {/* CONTROLS */}
             <section className="card overflow-hidden">
-              <button onClick={() => setShowControls(!showControls)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-navy-50 dark:hover:bg-navy-700/50 transition-colors">
+              <button
+                onClick={() => setShowControls(!showControls)}
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-navy-50 dark:hover:bg-navy-700/50 transition-colors"
+              >
                 <div className="flex items-center gap-2">
                   <Settings2 size={14} className="text-teal-500" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-navy-600 dark:text-navy-300">Sidekick Controls</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-navy-600 dark:text-navy-300">
+                    Sidekick Controls
+                  </span>
                 </div>
-                <ChevronDown size={16} className={`text-navy-500 transition-transform duration-300 ${showControls ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  size={16}
+                  className={`text-navy-500 transition-transform duration-300 ${
+                    showControls ? 'rotate-180' : ''
+                  }`}
+                />
               </button>
 
-              <div className={`overflow-hidden transition-all duration-300 ${showControls ? 'max-h-[600px]' : 'max-h-0'}`}>
+              <div
+                className={`overflow-hidden transition-all duration-300 ${
+                  showControls ? 'max-h-[600px]' : 'max-h-0'
+                }`}
+              >
                 <div className="p-4 pt-0 space-y-4 border-t border-navy-200 dark:border-navy-600">
-
                   <div className="grid grid-cols-2 gap-3 pt-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase text-navy-500 dark:text-navy-400 tracking-wider">Writing Mode</label>
-                      <select value={mode} onChange={(e) => setMode(e.target.value as WritingMode)} className="input-field w-full rounded-lg px-3 py-2.5 text-sm cursor-pointer">
-                        {WRITING_MODES.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+                      <label className="text-[10px] font-bold uppercase text-navy-500 dark:text-navy-400 tracking-wider">
+                        Writing Mode
+                      </label>
+                      <select
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value as WritingMode)}
+                        className="input-field w-full rounded-lg px-3 py-2.5 text-sm cursor-pointer"
+                      >
+                        {WRITING_MODES.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase text-navy-500 dark:text-navy-400 tracking-wider">Model</label>
-                      <select value={model} onChange={(e) => setModel(e.target.value)} className="input-field w-full rounded-lg px-3 py-2.5 text-sm cursor-pointer">
-                        {MODELS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+                      <label className="text-[10px] font-bold uppercase text-navy-500 dark:text-navy-400 tracking-wider">
+                        Model
+                      </label>
+                      <select
+                        value={model}
+                        onChange={(e) => setModel(e.target.value)}
+                        className="input-field w-full rounded-lg px-3 py-2.5 text-sm cursor-pointer"
+                      >
+                        {MODELS.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2">
-                    <Select label="Tense" value={controls.tense} onChange={(v) => setControls({ ...controls, tense: v })} options={['as_is', 'present', 'past']} />
-                    <Select label="POV" value={controls.pov} onChange={(v) => setControls({ ...controls, pov: v })} options={['as_is', 'first', 'third']} />
-                    <Select label="Length" value={controls.length} onChange={(v) => setControls({ ...controls, length: v })} options={['shorter', 'same', 'longer']} />
+                    <Select
+                      label="Tense"
+                      value={controls.tense}
+                      onChange={(v) => setControls({ ...controls, tense: v })}
+                      options={['as_is', 'present', 'past']}
+                    />
+                    <Select
+                      label="POV"
+                      value={controls.pov}
+                      onChange={(v) => setControls({ ...controls, pov: v })}
+                      options={['as_is', 'first', 'third']}
+                    />
+                    <Select
+                      label="Length"
+                      value={controls.length}
+                      onChange={(v) => setControls({ ...controls, length: v })}
+                      options={['shorter', 'same', 'longer']}
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
-                    <Select label="Transitions" value={controls.transitions} onChange={(v) => setControls({ ...controls, transitions: v })} options={['off', 'light', 'strong']} />
-                    <Select label="Vividness" value={controls.vividness} onChange={(v) => setControls({ ...controls, vividness: v })} options={['low', 'balanced', 'high']} />
+                    <Select
+                      label="Transitions"
+                      value={controls.transitions}
+                      onChange={(v) => setControls({ ...controls, transitions: v })}
+                      options={['off', 'light', 'strong']}
+                    />
+                    <Select
+                      label="Vividness"
+                      value={controls.vividness}
+                      onChange={(v) => setControls({ ...controls, vividness: v })}
+                      options={['low', 'balanced', 'high']}
+                    />
                   </div>
 
                   {/* Variations */}
@@ -344,13 +489,25 @@ export default function App() {
                     <div className="flex items-center gap-2">
                       <Layout size={14} className="text-teal-500" />
                       <div>
-                        <p className="text-xs font-semibold text-navy-800 dark:text-navy-100">Variations</p>
-                        <p className="text-[10px] text-navy-500 dark:text-navy-400">Options to generate</p>
+                        <p className="text-xs font-semibold text-navy-800 dark:text-navy-100">
+                          Variations
+                        </p>
+                        <p className="text-[10px] text-navy-500 dark:text-navy-400">
+                          Options to generate
+                        </p>
                       </div>
                     </div>
                     <div className="flex gap-1">
                       {[1, 2, 3, 5].map((v) => (
-                        <button key={v} onClick={() => setVariationCount(v)} className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${variationCount === v ? 'bg-lime-400 text-navy-800' : 'bg-white dark:bg-navy-600 border border-navy-200 dark:border-navy-500 text-navy-600 dark:text-navy-300 hover:border-teal-500'}`}>
+                        <button
+                          key={v}
+                          onClick={() => setVariationCount(v)}
+                          className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                            variationCount === v
+                              ? 'bg-lime-400 text-navy-800'
+                              : 'bg-white dark:bg-navy-600 border border-navy-200 dark:border-navy-500 text-navy-600 dark:text-navy-300 hover:border-teal-500'
+                          }`}
+                        >
                           {v}
                         </button>
                       ))}
@@ -360,16 +517,38 @@ export default function App() {
                   {/* Summary Toggle */}
                   <label className="flex items-center justify-between p-3 bg-navy-50 dark:bg-navy-700/50 rounded-lg border border-navy-200 dark:border-navy-600 cursor-pointer hover:border-teal-500 transition-colors">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 size={14} className={controls.includeSummary ? 'text-teal-500' : 'text-navy-400'} />
+                      <CheckCircle2
+                        size={14}
+                        className={controls.includeSummary ? 'text-teal-500' : 'text-navy-400'}
+                      />
                       <div>
-                        <p className="text-xs font-semibold text-navy-800 dark:text-navy-100">Include Summary</p>
-                        <p className="text-[10px] text-navy-500 dark:text-navy-400">Generate a brief summary</p>
+                        <p className="text-xs font-semibold text-navy-800 dark:text-navy-100">
+                          Include Summary
+                        </p>
+                        <p className="text-[10px] text-navy-500 dark:text-navy-400">
+                          Generate a brief summary
+                        </p>
                       </div>
                     </div>
-                    <div className={`toggle-track w-11 h-6 rounded-full relative ${controls.includeSummary ? 'active' : ''}`}>
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${controls.includeSummary ? 'left-6' : 'left-1'}`} />
+                    <div
+                      className={`toggle-track w-11 h-6 rounded-full relative ${
+                        controls.includeSummary ? 'active' : ''
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                          controls.includeSummary ? 'left-6' : 'left-1'
+                        }`}
+                      />
                     </div>
-                    <input type="checkbox" checked={controls.includeSummary} onChange={(e) => setControls({ ...controls, includeSummary: e.target.checked })} className="sr-only" />
+                    <input
+                      type="checkbox"
+                      checked={controls.includeSummary}
+                      onChange={(e) =>
+                        setControls({ ...controls, includeSummary: e.target.checked })
+                      }
+                      className="sr-only"
+                    />
                   </label>
                 </div>
               </div>
@@ -378,30 +557,45 @@ export default function App() {
             {/* Keyboard Hint */}
             <div className="flex items-center justify-center gap-2 text-[11px] text-navy-500 dark:text-navy-400">
               <span>Press</span>
-              <kbd className="px-2 py-1 bg-navy-100 dark:bg-navy-700 border border-navy-200 dark:border-navy-600 rounded-lg text-navy-600 dark:text-navy-300 font-mono text-[10px]">⌘</kbd>
+              <kbd className="px-2 py-1 bg-navy-100 dark:bg-navy-700 border border-navy-200 dark:border-navy-600 rounded-lg text-navy-600 dark:text-navy-300 font-mono text-[10px]">
+                ⌘
+              </kbd>
               <span>+</span>
-              <kbd className="px-2 py-1 bg-navy-100 dark:bg-navy-700 border border-navy-200 dark:border-navy-600 rounded-lg text-navy-600 dark:text-navy-300 font-mono text-[10px]">Enter</kbd>
+              <kbd className="px-2 py-1 bg-navy-100 dark:bg-navy-700 border border-navy-200 dark:border-navy-600 rounded-lg text-navy-600 dark:text-navy-300 font-mono text-[10px]">
+                Enter
+              </kbd>
               <span>to transform</span>
             </div>
           </div>
 
           {/* RIGHT */}
           <div className="lg:col-span-7 space-y-5">
-
             {/* Empty */}
             {!result && !loading && (
               <div className="card p-12 flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-navy-300 dark:border-navy-600">
                 <div className="w-20 h-20 rounded-2xl bg-lime-400/20 dark:bg-lime-400/10 flex items-center justify-center mb-5">
                   <Sparkles size={36} className="text-lime-500" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-navy-800 dark:text-white mb-2">Ready to Transform</h3>
+                <h3 className="font-display text-xl font-bold text-navy-800 dark:text-white mb-2">
+                  Ready to Transform
+                </h3>
                 <p className="text-sm text-navy-500 dark:text-navy-400 text-center max-w-sm mb-6">
-                  Paste your text on the left and click <span className="font-semibold text-lime-500">Transform</span> to see the magic.
+                  Paste your text on the left and click{' '}
+                  <span className="font-semibold text-lime-500">Transform</span> to see the magic.
                 </p>
                 <div className="flex items-center gap-6 text-xs text-navy-400">
-                  <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-teal-500" /><span>3 writing modes</span></div>
-                  <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-indigo-500" /><span>6 AI models</span></div>
-                  <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-lime-400" /><span>Up to 5 variations</span></div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-teal-500" />
+                    <span>3 writing modes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                    <span>6 AI models</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-lime-400" />
+                    <span>Up to 5 variations</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -416,21 +610,28 @@ export default function App() {
                     <Sparkles size={24} className="text-teal-500 animate-pulse-soft" />
                   </div>
                 </div>
-                <h3 className="font-display text-lg font-bold text-navy-800 dark:text-white mb-1">Transforming your text...</h3>
-                <p className="text-sm text-navy-500 dark:text-navy-400">This usually takes a few seconds</p>
+                <h3 className="font-display text-lg font-bold text-navy-800 dark:text-white mb-1">
+                  Transforming your text...
+                </h3>
+                <p className="text-sm text-navy-500 dark:text-navy-400">
+                  This usually takes a few seconds
+                </p>
               </div>
             )}
 
             {/* Results */}
             {result && !loading && (
               <div className="space-y-5 animate-fade-in">
-
                 {showConfetti && (
                   <div className="card-accent p-4 flex items-center gap-3 bg-teal-50 dark:bg-teal-900/20">
                     <PartyPopper size={24} className="text-teal-500" />
                     <div>
-                      <p className="font-bold text-navy-800 dark:text-white">Amazing! Your first transformation! 🎉</p>
-                      <p className="text-sm text-navy-600 dark:text-navy-300">Your text has been beautifully rewritten.</p>
+                      <p className="font-bold text-navy-800 dark:text-white">
+                        Amazing! Your first transformation! 🎉
+                      </p>
+                      <p className="text-sm text-navy-600 dark:text-navy-300">
+                        Your text has been beautifully rewritten.
+                      </p>
                     </div>
                   </div>
                 )}
@@ -438,7 +639,15 @@ export default function App() {
                 {result.variations.length > 1 && (
                   <div className="flex items-center gap-2 overflow-x-auto pb-1">
                     {result.variations.map((_, idx) => (
-                      <button key={idx} onClick={() => setSelectedIdx(idx)} className={`shrink-0 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${selectedIdx === idx ? 'bg-lime-400 text-navy-800' : 'bg-navy-100 dark:bg-navy-700 text-navy-600 dark:text-navy-300 hover:bg-navy-200 dark:hover:bg-navy-600'}`}>
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedIdx(idx)}
+                        className={`shrink-0 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                          selectedIdx === idx
+                            ? 'bg-lime-400 text-navy-800'
+                            : 'bg-navy-100 dark:bg-navy-700 text-navy-600 dark:text-navy-300 hover:bg-navy-200 dark:hover:bg-navy-600'
+                        }`}
+                      >
                         Variation {idx + 1}
                       </button>
                     ))}
@@ -450,20 +659,38 @@ export default function App() {
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse-soft" />
                       <span className="text-xs font-bold text-navy-600 dark:text-navy-300 uppercase tracking-wider">
-                        {WRITING_MODES.find(m => m.id === mode)?.label}
+                        {WRITING_MODES.find((m) => m.id === mode)?.label}
                       </span>
                     </div>
-                    <button onClick={copyPrimary} className="btn-secondary flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium">
+                    <button
+                      onClick={copyPrimary}
+                      className="btn-secondary flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium"
+                    >
                       <Copy size={12} />
                       Copy
                     </button>
                   </div>
                   <div className="p-6 text-base leading-relaxed text-navy-800 dark:text-navy-100 min-h-[200px] whitespace-pre-wrap">
-                    {typewriter ? <TypewriterText text={result.variations[selectedIdx]} /> : result.variations[selectedIdx]}
+                    {typewriter ? (
+                      <TypewriterText text={result.variations[selectedIdx]} />
+                    ) : (
+                      result.variations[selectedIdx]
+                    )}
                   </div>
                   <div className="px-4 py-3 bg-navy-50 dark:bg-navy-700/50 border-t border-navy-200 dark:border-navy-600 flex flex-wrap items-center gap-4 text-[10px] text-navy-500 dark:text-navy-400">
-                    <span><span className="uppercase tracking-wider font-medium">Model:</span> <span className="text-navy-700 dark:text-navy-200">{MODELS.find(m => m.id === result.model)?.label}</span></span>
-                    <span><span className="uppercase tracking-wider font-medium">Words:</span> <span className="text-navy-700 dark:text-navy-200">{result.variations[selectedIdx].split(/\s+/).filter(Boolean).length}</span> → {result.originalWordCount} original</span>
+                    <span>
+                      <span className="uppercase tracking-wider font-medium">Model:</span>{' '}
+                      <span className="text-navy-700 dark:text-navy-200">
+                        {MODELS.find((m) => m.id === result.model)?.label}
+                      </span>
+                    </span>
+                    <span>
+                      <span className="uppercase tracking-wider font-medium">Words:</span>{' '}
+                      <span className="text-navy-700 dark:text-navy-200">
+                        {result.variations[selectedIdx].split(/\s+/).filter(Boolean).length}
+                      </span>{' '}
+                      → {result.originalWordCount} original
+                    </span>
                   </div>
                 </section>
 
@@ -472,29 +699,46 @@ export default function App() {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <Zap size={14} className="text-indigo-500" />
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Executive Summary</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                          Executive Summary
+                        </h4>
                       </div>
-                      <button onClick={() => copy(result.summary!)} className="p-1.5 hover:bg-navy-100 dark:hover:bg-navy-700 text-navy-500 rounded-lg transition-colors">
+                      <button
+                        onClick={() => copy(result.summary!)}
+                        className="p-1.5 hover:bg-navy-100 dark:hover:bg-navy-700 text-navy-500 rounded-lg transition-colors"
+                      >
                         <Copy size={12} />
                       </button>
                     </div>
-                    <p className="text-sm text-navy-600 dark:text-navy-300 italic leading-relaxed">"{result.summary}"</p>
+                    <p className="text-sm text-navy-600 dark:text-navy-300 italic leading-relaxed">
+                      "{result.summary}"
+                    </p>
                   </section>
                 )}
 
                 <section className="space-y-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck size={14} className="text-navy-400" />
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-navy-500 dark:text-navy-400">Compare Changes</h3>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-navy-500 dark:text-navy-400">
+                      Compare Changes
+                    </h3>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="card p-4">
-                      <span className="text-[10px] font-bold text-navy-400 uppercase tracking-wider block mb-2">Original</span>
-                      <p className="text-xs text-navy-500 dark:text-navy-400 leading-relaxed max-h-32 overflow-y-auto">{inputText}</p>
+                      <span className="text-[10px] font-bold text-navy-400 uppercase tracking-wider block mb-2">
+                        Original
+                      </span>
+                      <p className="text-xs text-navy-500 dark:text-navy-400 leading-relaxed max-h-32 overflow-y-auto">
+                        {inputText}
+                      </p>
                     </div>
                     <div className="card p-4 bg-lime-50 dark:bg-lime-900/10 border-lime-300 dark:border-lime-800">
-                      <span className="text-[10px] font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wider block mb-2">Transformed</span>
-                      <p className="text-xs text-navy-700 dark:text-navy-200 leading-relaxed max-h-32 overflow-y-auto">{result.variations[selectedIdx]}</p>
+                      <span className="text-[10px] font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wider block mb-2">
+                        Transformed
+                      </span>
+                      <p className="text-xs text-navy-700 dark:text-navy-200 leading-relaxed max-h-32 overflow-y-auto">
+                        {result.variations[selectedIdx]}
+                      </p>
                     </div>
                   </div>
                 </section>
@@ -509,14 +753,30 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-navy-500 dark:text-navy-400">
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5"><Sparkles size={12} className="text-lime-500" /><span className="font-medium">Powered by Groq</span></span>
+              <span className="flex items-center gap-1.5">
+                <Sparkles size={12} className="text-lime-500" />
+                <span className="font-medium">Powered by Groq</span>
+              </span>
               <span className="w-1 h-1 rounded-full bg-navy-300 dark:bg-navy-600" />
               <span>No credit card required</span>
             </div>
             <div className="flex items-center gap-6">
-              <a href="#" className="hover:text-navy-800 dark:hover:text-white transition-colors">Documentation</a>
-              <a href="#" className="hover:text-navy-800 dark:hover:text-white transition-colors">Privacy</a>
-              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-teal-500" /><span>All systems operational</span></div>
+              <a
+                href="#"
+                className="hover:text-navy-800 dark:hover:text-white transition-colors"
+              >
+                Documentation
+              </a>
+              <a
+                href="#"
+                className="hover:text-navy-800 dark:hover:text-white transition-colors"
+              >
+                Privacy
+              </a>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-teal-500" />
+                <span>All systems operational</span>
+              </div>
             </div>
           </div>
         </div>
@@ -530,12 +790,32 @@ export default function App() {
 // ============================================
 // SELECT HELPER
 // ============================================
-function Select({ label, value, onChange, options }: { label: string; value: string; onChange: (v: any) => void; options: string[] }) {
+function Select({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: any) => void;
+  options: string[];
+}) {
   return (
     <div className="space-y-1">
-      <label className="text-[9px] font-bold uppercase text-navy-500 dark:text-navy-400 tracking-wider">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="input-field w-full rounded-lg px-2 py-2 text-[11px] font-medium cursor-pointer">
-        {options.map((o) => <option key={o} value={o}>{o.replace(/_/g, ' ')}</option>)}
+      <label className="text-[9px] font-bold uppercase text-navy-500 dark:text-navy-400 tracking-wider">
+        {label}
+      </label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="input-field w-full rounded-lg px-2 py-2 text-[11px] font-medium cursor-pointer"
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o.replace(/_/g, ' ')}
+          </option>
+        ))}
       </select>
     </div>
   );
