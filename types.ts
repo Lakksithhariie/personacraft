@@ -1,9 +1,14 @@
 // types.ts
 
 export type WritingMode =
-  | 'exec_storyteller'
-  | 'founder_creator'
-  | 'investigative_clarity';
+  | 'eloquent'
+  | 'planiloquent'
+  | 'breviloquent'
+  | 'dulciloquent'
+  | 'doctiloquent'
+  | 'suaviloquent'
+  | 'grandiloquent'
+  | 'melliloquent';
 
 export type Tense = 'as_is' | 'present' | 'past';
 export type POV = 'as_is' | 'first' | 'third';
@@ -25,14 +30,13 @@ export interface RephraseRequest {
   mode: WritingMode;
   model: string;
   variationCount: number;
-  // ❌ pinnedTerms: string[]; — REMOVED
   controls: SidekickControls;
 }
 
 export interface RephraseResponse {
   variations: string[];
   summary?: string;
-  warnings?: string[];  // Keep this (optional), won't cause issues
+  warnings?: string[];
   model: string;
   variationCount: number;
   originalWordCount: number;

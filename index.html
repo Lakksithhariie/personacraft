@@ -10,15 +10,9 @@
     <link rel="apple-touch-icon" href="/favicon.svg">
     
     <!-- Meta Tags -->
-    <meta name="description" content="Transform your writing with AI-powered precision and style. Professional rewriting with multiple modes and variations.">
-    <meta name="theme-color" content="#1f243c" media="(prefers-color-scheme: dark)">
+    <meta name="description" content="Transform your writing with AI-powered precision and style.">
+    <meta name="theme-color" content="#0A3C30" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    
-    <!-- Open Graph / Social -->
-    <meta property="og:title" content="Personacraft — AI Writing Assistant">
-    <meta property="og:description" content="Transform your writing with AI-powered precision and style.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="/favicon.svg">
     
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,68 +22,89 @@
         theme: {
           extend: {
             colors: {
-              lime: {
-                50: '#fefff0',
-                100: '#fcffd6',
-                200: '#f5ff99',
-                300: '#e8ff4d',
-                400: '#d5ff00',
-                500: '#c4eb00',
-                600: '#9fbe00',
-                700: '#778f00',
-                800: '#5c6f00',
-                900: '#3d4a00',
-                950: '#1f2500',
+              // Emerald Deep - Primary Brand
+              brand: {
+                50: '#ebf9f5',
+                100: '#d6f4ed',
+                200: '#a8efdf',
+                300: '#75efd3',
+                400: '#3df4ca',
+                500: '#00674F',
+                600: '#00cc9c',
+                700: '#009975',
+                800: '#00664e',
+                900: '#003327',
+                950: '#001913',
               },
+              // Emerald Mint - Accent
+              mint: {
+                50: '#edfff7',
+                100: '#daf0eb',
+                200: '#b3e4d9',
+                300: '#87ddc9',
+                400: '#59d8ba',
+                500: '#73E6CB',
+                600: '#17b48f',
+                700: '#0c8c6e',
+                800: '#04614b',
+                900: '#003226',
+                950: '#001913',
+              },
+              // Emerald Teal - Secondary
               teal: {
-                50: '#e6f7f5',
-                100: '#b3e8e3',
-                200: '#80d9d0',
-                300: '#4dcabd',
-                400: '#1abba9',
-                500: '#027e6f',
-                600: '#026b5e',
-                700: '#02584e',
-                800: '#01453d',
-                900: '#01322c',
-                950: '#001f1c',
+                50: '#eef5f4',
+                100: '#ddede9',
+                200: '#baddd5',
+                300: '#93d1c2',
+                400: '#6ac7b1',
+                500: '#3EBB9E',
+                600: '#2d9e84',
+                700: '#1e7a65',
+                800: '#115444',
+                900: '#072b23',
+                950: '#031611',
               },
-              indigo: {
-                50: '#eeeaff',
-                100: '#d4cbff',
-                200: '#a897ff',
-                300: '#7c63ff',
-                400: '#5030ff',
-                500: '#1b0d6f',
-                600: '#180c63',
-                700: '#140a52',
-                800: '#100842',
-                900: '#0c0631',
-                950: '#080421',
+              // Emerald Dark - Dark Mode Base
+              dark: {
+                50: '#f7faf9',
+                100: '#e8f0ee',
+                200: '#d1e1dd',
+                300: '#a8c9c1',
+                400: '#7aada0',
+                500: '#0A3C30',
+                600: '#083328',
+                700: '#062a21',
+                800: '#041f18',
+                900: '#021510',
+                950: '#010a08',
               },
-              navy: {
-                50: '#f4f5f7',
-                100: '#e4e6eb',
-                200: '#c9cdd7',
-                300: '#9ea5b5',
-                400: '#6b7489',
-                500: '#4a5568',
-                600: '#3d4559',
-                700: '#2d3448',
-                800: '#1f243c',
-                900: '#181c2e',
-                950: '#0f1220',
+              // Neutral Gray
+              slate: {
+                50: '#f8fafc',
+                100: '#f1f5f9',
+                200: '#e2e8f0',
+                300: '#cbd5e1',
+                400: '#94a3b8',
+                500: '#64748b',
+                600: '#475569',
+                700: '#334155',
+                800: '#1e293b',
+                900: '#0f172a',
+                950: '#020617',
               },
             },
             fontFamily: {
-              sans: ['Outfit', 'system-ui', 'sans-serif'],
-              display: ['Libre Franklin', 'system-ui', 'sans-serif'],
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              display: ['Inter', 'system-ui', 'sans-serif'],
             },
             animation: {
-              'fade-in': 'fadeIn 0.3s ease-out',
+              'fade-in': 'fadeIn 0.4s ease-out',
               'slide-up': 'slideUp 0.4s ease-out',
-              'confetti-fall': 'confettiFall 3s ease-out forwards',
+              'slide-down': 'slideDown 0.3s ease-out',
+              'scale-in': 'scaleIn 0.2s ease-out',
               'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+              'shimmer': 'shimmer 2s linear infinite',
+              'confetti-fall': 'confettiFall 3s ease-out forwards',
             },
             keyframes: {
               fadeIn: {
@@ -97,17 +112,35 @@
                 '100%': { opacity: '1' },
               },
               slideUp: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '0%': { opacity: '0', transform: 'translateY(16px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               },
-              confettiFall: {
-                '0%': { transform: 'translateY(-100%) rotate(0deg)', opacity: '1' },
-                '100%': { transform: 'translateY(100vh) rotate(720deg)', opacity: '0' },
+              slideDown: {
+                '0%': { opacity: '0', transform: 'translateY(-8px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              scaleIn: {
+                '0%': { opacity: '0', transform: 'scale(0.95)' },
+                '100%': { opacity: '1', transform: 'scale(1)' },
               },
               pulseSoft: {
                 '0%, 100%': { opacity: '1' },
                 '50%': { opacity: '0.6' },
               },
+              shimmer: {
+                '0%': { transform: 'translateX(-100%)' },
+                '100%': { transform: 'translateX(100%)' },
+              },
+              confettiFall: {
+                '0%': { transform: 'translateY(-100%) rotate(0deg)', opacity: '1' },
+                '100%': { transform: 'translateY(100vh) rotate(720deg)', opacity: '0' },
+              },
+            },
+            boxShadow: {
+              'soft': '0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 16px -4px rgba(0, 0, 0, 0.1)',
+              'medium': '0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 8px 24px -4px rgba(0, 0, 0, 0.12)',
+              'glow': '0 0 24px -4px rgba(0, 103, 79, 0.3)',
+              'glow-mint': '0 0 24px -4px rgba(115, 230, 203, 0.4)',
             },
           },
         },
@@ -117,138 +150,209 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
       * {
-        font-family: 'Outfit', system-ui, sans-serif;
+        font-family: 'Inter', system-ui, sans-serif;
       }
       
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Libre Franklin', system-ui, sans-serif;
-      }
-      
+      /* Light Mode Base */
       body {
-        background-color: #ffffff;
-        color: #1f243c;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        background-color: #f8fafc;
+        color: #0f172a;
       }
       
-      .dark body,
-      .dark {
-        background-color: #1f243c;
-        color: #f4f5f7;
+      /* Dark Mode Base */
+      html.dark body {
+        background-color: #0A3C30;
+        color: #f1f5f9;
       }
       
+      html.dark {
+        background-color: #0A3C30;
+      }
+      
+      /* Cards */
       .card {
-        background-color: #ffffff;
-        border: 1px solid #e4e6eb;
-        border-radius: 12px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
         transition: all 0.2s ease;
       }
       
-      .dark .card {
-        background-color: #2d3448;
-        border-color: #3d4559;
+      html.dark .card {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.08);
       }
       
-      .card-accent {
-        background-color: #ffffff;
-        border: 2px solid #027e6f;
-        border-radius: 12px;
-        transition: all 0.2s ease;
+      .card:hover {
+        border-color: #cbd5e1;
       }
       
-      .dark .card-accent {
-        background-color: #2d3448;
-        border-color: #027e6f;
+      html.dark .card:hover {
+        border-color: rgba(255, 255, 255, 0.12);
       }
       
+      /* Primary Button */
       .btn-primary {
-        background-color: #d5ff00;
-        color: #1f243c;
+        background: linear-gradient(135deg, #00674F 0%, #009975 100%);
+        color: white;
         font-weight: 600;
         border: none;
+        box-shadow: 0 2px 8px -2px rgba(0, 103, 79, 0.4);
         transition: all 0.2s ease;
       }
+      
       .btn-primary:hover:not(:disabled) {
-        background-color: #c4eb00;
         transform: translateY(-1px);
+        box-shadow: 0 4px 16px -2px rgba(0, 103, 79, 0.5);
       }
+      
       .btn-primary:active:not(:disabled) {
         transform: translateY(0);
       }
+      
       .btn-primary:disabled {
         opacity: 0.5;
         cursor: not-allowed;
         transform: none;
       }
       
+      /* Secondary Button */
       .btn-secondary {
-        background-color: transparent;
-        color: #1f243c;
-        border: 1px solid #c9cdd7;
+        background: transparent;
+        color: #475569;
+        border: 1px solid #e2e8f0;
         transition: all 0.2s ease;
       }
+      
       .btn-secondary:hover {
-        border-color: #027e6f;
-        color: #027e6f;
-      }
-      .dark .btn-secondary {
-        color: #e4e6eb;
-        border-color: #4a5568;
-      }
-      .dark .btn-secondary:hover {
-        border-color: #d5ff00;
-        color: #d5ff00;
+        background: #f1f5f9;
+        border-color: #cbd5e1;
       }
       
-      .input-field {
-        background-color: #ffffff;
-        border: 1px solid #e4e6eb;
-        color: #1f243c;
+      html.dark .btn-secondary {
+        color: #e2e8f0;
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      html.dark .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+      
+      /* Ghost Button */
+      .btn-ghost {
+        background: transparent;
+        color: #64748b;
+        border: none;
         transition: all 0.2s ease;
       }
+      
+      .btn-ghost:hover {
+        background: #f1f5f9;
+        color: #334155;
+      }
+      
+      html.dark .btn-ghost {
+        color: #94a3b8;
+      }
+      
+      html.dark .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #e2e8f0;
+      }
+      
+      /* Input Fields */
+      .input-field {
+        background: white;
+        border: 1px solid #e2e8f0;
+        color: #0f172a;
+        transition: all 0.2s ease;
+      }
+      
       .input-field:focus {
-        border-color: #027e6f;
-        outline: 2px solid rgba(2, 126, 111, 0.2);
-        outline-offset: 0;
+        border-color: #00674F;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 103, 79, 0.1);
       }
+      
       .input-field::placeholder {
-        color: #9ea5b5;
-      }
-      .dark .input-field {
-        background-color: #2d3448;
-        border-color: #4a5568;
-        color: #f4f5f7;
-      }
-      .dark .input-field:focus {
-        border-color: #d5ff00;
-        outline-color: rgba(213, 255, 0, 0.2);
-      }
-      .dark .input-field::placeholder {
-        color: #6b7489;
+        color: #94a3b8;
       }
       
-      ::-webkit-scrollbar { width: 6px; height: 6px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { 
-        background: #c9cdd7; 
-        border-radius: 3px; 
+      html.dark .input-field {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #f1f5f9;
       }
-      ::-webkit-scrollbar-thumb:hover { background: #9ea5b5; }
-      .dark ::-webkit-scrollbar-thumb { background: #4a5568; }
-      .dark ::-webkit-scrollbar-thumb:hover { background: #6b7489; }
       
+      html.dark .input-field:focus {
+        border-color: #73E6CB;
+        box-shadow: 0 0 0 3px rgba(115, 230, 203, 0.15);
+      }
+      
+      html.dark .input-field::placeholder {
+        color: #64748b;
+      }
+      
+      /* Toggle */
+      .toggle-track {
+        background: #e2e8f0;
+        transition: background 0.2s ease;
+      }
+      
+      .toggle-track.active {
+        background: #00674F;
+      }
+      
+      html.dark .toggle-track {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      html.dark .toggle-track.active {
+        background: #73E6CB;
+      }
+      
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      
+      html.dark ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      
+      html.dark ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+      
+      /* Selection */
       ::selection {
-        background: rgba(213, 255, 0, 0.3);
-        color: #1f243c;
-      }
-      .dark ::selection {
-        background: rgba(213, 255, 0, 0.3);
-        color: #ffffff;
+        background: rgba(0, 103, 79, 0.2);
+        color: inherit;
       }
       
+      html.dark ::selection {
+        background: rgba(115, 230, 203, 0.3);
+      }
+      
+      /* Confetti */
       .confetti {
         position: fixed;
         width: 10px;
@@ -260,34 +364,48 @@
         pointer-events: none;
       }
       
+      /* Typewriter Cursor */
       .typewriter-cursor {
         display: inline-block;
         width: 2px;
         height: 1.2em;
-        background: #027e6f;
+        background: #00674F;
         margin-left: 2px;
         animation: blink 0.8s infinite;
       }
-      .dark .typewriter-cursor {
-        background: #d5ff00;
+      
+      html.dark .typewriter-cursor {
+        background: #73E6CB;
       }
+      
       @keyframes blink {
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0; }
       }
       
-      .toggle-track {
-        background-color: #e4e6eb;
-        transition: background-color 0.2s ease;
+      /* Gradient Text */
+      .gradient-text {
+        background: linear-gradient(135deg, #00674F 0%, #3EBB9E 50%, #73E6CB 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
-      .toggle-track.active {
-        background-color: #027e6f;
+      
+      /* Shimmer */
+      .shimmer {
+        position: relative;
+        overflow: hidden;
       }
-      .dark .toggle-track {
-        background-color: #4a5568;
-      }
-      .dark .toggle-track.active {
-        background-color: #d5ff00;
+      
+      .shimmer::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: shimmer 2s infinite;
       }
     </style>
     
@@ -296,13 +414,11 @@
       "imports": {
         "react/": "https://esm.sh/react@^19.2.4/",
         "react": "https://esm.sh/react@^19.2.4",
-        "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
         "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
         "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
       }
     }
     </script>
-    <link rel="stylesheet" href="/index.css">
 </head>
 <body class="min-h-screen antialiased">
     <div id="root"></div>
