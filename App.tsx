@@ -1,4 +1,4 @@
-// App.tsx - Clean SaaS UI Revamp
+// App.tsx — Fixed layout: config inside columns, no overlap
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
@@ -8,10 +8,9 @@ import {
   FileText,
   Zap,
   AlertCircle,
-  CheckCircle2,
+  Check,
   ChevronDown,
   Sparkles,
-  Check,
   Keyboard,
   Github,
   Sun,
@@ -55,10 +54,10 @@ function useTheme() {
 }
 
 // ============================================
-// COMPONENTS
+// CONFETTI
 // ============================================
 function Confetti({ count = 50 }: { count?: number }) {
-  const colors = ['#00674F', '#73E6CB', '#3EBB9E', '#009975', '#59d8ba'];
+  const colors = ['#FF8243', '#FFC0CB', '#FCE883', '#069494'];
   const pieces = Array.from({ length: count }, (_, i) => ({
     id: i,
     style: {
@@ -67,6 +66,9 @@ function Confetti({ count = 50 }: { count?: number }) {
       animationDelay: `${Math.random() * 0.5}s`,
       animationDuration: `${2 + Math.random() * 2}s`,
       transform: `rotate(${Math.random() * 360}deg)`,
+      width: `${6 + Math.random() * 6}px`,
+      height: `${6 + Math.random() * 6}px`,
+      borderRadius: Math.random() > 0.5 ? '50%' : '2px',
     } as React.CSSProperties,
   }));
 
@@ -79,7 +81,10 @@ function Confetti({ count = 50 }: { count?: number }) {
   );
 }
 
-function TypewriterText({ text, speed = 10 }: { text: string; speed?: number }) {
+// ============================================
+// TYPEWRITER
+// ============================================
+function TypewriterText({ text, speed = 8 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState('');
   const [complete, setComplete] = useState(false);
   const idx = useRef(0);
@@ -88,7 +93,6 @@ function TypewriterText({ text, speed = 10 }: { text: string; speed?: number }) 
     setDisplayed('');
     setComplete(false);
     idx.current = 0;
-
     const timer = setInterval(() => {
       if (idx.current < text.length) {
         setDisplayed(text.slice(0, idx.current + 1));
@@ -98,7 +102,6 @@ function TypewriterText({ text, speed = 10 }: { text: string; speed?: number }) 
         setComplete(true);
       }
     }, speed);
-
     return () => clearInterval(timer);
   }, [text, speed]);
 
@@ -110,6 +113,26 @@ function TypewriterText({ text, speed = 10 }: { text: string; speed?: number }) 
   );
 }
 
+// ============================================
+// SKELETON
+// ============================================
+function SkeletonLoader() {
+  return (
+    <div className="space-y-3 animate-fade-in">
+      {[100, 92, 100, 75, 88, 100, 60].map((w, i) => (
+        <div
+          key={i}
+          className="h-4 skeleton-line"
+          style={{ width: `${w}%`, animationDelay: `${i * 0.08}s` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ============================================
+// TOAST
+// ============================================
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   useEffect(() => {
     const t = setTimeout(onClose, 2500);
@@ -117,83 +140,82 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
-      <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-dark-500 border border-slate-200 dark:border-white/10 rounded-xl shadow-medium">
-        <div className="w-5 h-5 rounded-full bg-brand-500/10 dark:bg-mint-500/10 flex items-center justify-center">
-          <Check size={12} className="text-brand-500 dark:text-mint-500" />
-        </div>
-        <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{message}</span>
+    <div className="fixed bottom-5 right-5 z-50 animate-slide-up">
+      <div className="flex items-center gap-2.5 px-4 py-2.5 bg-background border border-border rounded-lg">
+        <Check size={14} className="text-teal-500" />
+        <span className="text-sm text-foreground">{message}</span>
       </div>
     </div>
   );
 }
 
-function ModeSelector({ value, onChange }: { value: WritingMode; onChange: (m: WritingMode) => void }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const selected = WRITING_MODES.find((m) => m.id === value);
+// ============================================
+// SELECT DROPDOWN — FIXED: opens inside its
+// own stacking context, never overlaps siblings
+// ============================================
+function SelectDropdown({
+  value,
+  onChange,
+  options,
+  renderOption,
+  renderValue,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { id: string; [k: string]: any }[];
+  renderOption: (opt: any, isSelected: boolean) => React.ReactNode;
+  renderValue: (opt: any) => React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const selected = options.find((o) => o.id === value);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   return (
-    <div className="relative" ref={ref}>
+    <div ref={containerRef} className="relative">
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:border-slate-300 dark:hover:border-white/20 transition-all text-left"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between gap-2 h-9 px-3 bg-background border border-border rounded-md text-sm text-foreground hover:bg-accent/50 transition-colors text-left"
       >
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-            {selected?.label}
-          </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
-            {selected?.description}
-          </div>
-        </div>
+        <span className="truncate text-[13px]">
+          {selected ? renderValue(selected) : 'Select...'}
+        </span>
         <ChevronDown
-          size={16}
-          className={`text-slate-400 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          size={14}
+          className={`text-muted-foreground shrink-0 transition-transform duration-200 ${
+            open ? 'rotate-180' : ''
+          }`}
         />
       </button>
 
-      {isOpen && (
-        <div className="absolute z-50 mt-2 w-full bg-white dark:bg-dark-500 border border-slate-200 dark:border-white/10 rounded-xl shadow-medium overflow-hidden animate-slide-down">
-          <div className="max-h-72 overflow-y-auto p-2">
-            {WRITING_MODES.map((mode) => (
+      {open && (
+        <div className="absolute left-0 right-0 mt-1 bg-popover border border-border rounded-md overflow-hidden animate-scale-in origin-top z-[100]">
+          <div className="max-h-[280px] overflow-y-auto p-1">
+            {options.map((opt) => (
               <button
-                key={mode.id}
+                key={opt.id}
                 type="button"
                 onClick={() => {
-                  onChange(mode.id);
-                  setIsOpen(false);
+                  onChange(opt.id);
+                  setOpen(false);
                 }}
-                className={`w-full px-3 py-2.5 rounded-lg text-left transition-all ${
-                  value === mode.id
-                    ? 'bg-brand-50 dark:bg-mint-500/10'
-                    : 'hover:bg-slate-50 dark:hover:bg-white/5'
+                className={`w-full px-2.5 py-2 rounded text-left transition-colors ${
+                  value === opt.id
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-foreground hover:bg-accent/50'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`text-sm font-medium ${
-                      value === mode.id
-                        ? 'text-brand-600 dark:text-mint-400'
-                        : 'text-slate-700 dark:text-slate-200'
-                    }`}
-                  >
-                    {mode.label}
-                  </span>
-                  {value === mode.id && (
-                    <Check size={14} className="text-brand-500 dark:text-mint-400" />
-                  )}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{mode.description}</p>
+                {renderOption(opt, value === opt.id)}
               </button>
             ))}
           </div>
@@ -203,82 +225,10 @@ function ModeSelector({ value, onChange }: { value: WritingMode; onChange: (m: W
   );
 }
 
-function ModelSelector({ value, onChange }: { value: string; onChange: (m: string) => void }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const selected = MODELS.find((m) => m.id === value);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:border-slate-300 dark:hover:border-white/20 transition-all text-left"
-      >
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-            {selected?.label}
-          </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
-            {selected?.contextWindow}
-          </div>
-        </div>
-        <ChevronDown
-          size={16}
-          className={`text-slate-400 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-        />
-      </button>
-
-      {isOpen && (
-        <div className="absolute z-50 mt-2 w-full bg-white dark:bg-dark-500 border border-slate-200 dark:border-white/10 rounded-xl shadow-medium overflow-hidden animate-slide-down">
-          <div className="max-h-72 overflow-y-auto p-2">
-            {MODELS.map((model) => (
-              <button
-                key={model.id}
-                type="button"
-                onClick={() => {
-                  onChange(model.id);
-                  setIsOpen(false);
-                }}
-                className={`w-full px-3 py-2.5 rounded-lg text-left transition-all ${
-                  value === model.id
-                    ? 'bg-brand-50 dark:bg-mint-500/10'
-                    : 'hover:bg-slate-50 dark:hover:bg-white/5'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`text-sm font-medium ${
-                      value === model.id
-                        ? 'text-brand-600 dark:text-mint-400'
-                        : 'text-slate-700 dark:text-slate-200'
-                    }`}
-                  >
-                    {model.label}
-                  </span>
-                  {value === model.id && (
-                    <Check size={14} className="text-brand-500 dark:text-mint-400" />
-                  )}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{model.strengths}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ControlPill({
+// ============================================
+// SEGMENTED CONTROL
+// ============================================
+function SegmentedControl({
   label,
   value,
   onChange,
@@ -290,19 +240,17 @@ function ControlPill({
   options: string[];
 }) {
   return (
-    <div className="space-y-2">
-      <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-        {label}
-      </label>
-      <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/5 rounded-lg">
+    <div className="space-y-1.5">
+      <label className="text-xs font-medium text-muted-foreground">{label}</label>
+      <div className="inline-flex items-center h-8 p-0.5 bg-muted rounded-md w-full">
         {options.map((opt) => (
           <button
             key={opt}
             onClick={() => onChange(opt)}
-            className={`flex-1 px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
+            className={`flex-1 h-full px-2 rounded text-xs font-medium transition-colors ${
               value === opt
-                ? 'bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                ? 'bg-background text-foreground border border-border'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {opt.replace(/_/g, ' ')}
@@ -339,7 +287,6 @@ export default function App() {
   const [typewriter, setTypewriter] = useState(false);
 
   const notify = useCallback((msg: string) => setToast(msg), []);
-
   const copy = useCallback(
     (text: string) => {
       navigator.clipboard.writeText(text);
@@ -347,7 +294,6 @@ export default function App() {
     },
     [notify]
   );
-
   const clear = useCallback(() => {
     setInputText('');
     setResult(null);
@@ -356,7 +302,6 @@ export default function App() {
     setTypewriter(false);
     notify('Workspace cleared');
   }, [notify]);
-
   const copyPrimary = useCallback(() => {
     if (result?.variations[selectedIdx]) copy(result.variations[selectedIdx]);
   }, [copy, result, selectedIdx]);
@@ -375,17 +320,10 @@ export default function App() {
     setTypewriter(false);
 
     try {
-      const res = await rephraseText({
-        text: inputText,
-        mode,
-        model,
-        variationCount,
-        controls,
-      });
+      const res = await rephraseText({ text: inputText, mode, model, variationCount, controls });
       setResult(res);
       setSelectedIdx(0);
       setTypewriter(true);
-
       if (firstSuccess) {
         setShowConfetti(true);
         setFirstSuccess(false);
@@ -401,12 +339,12 @@ export default function App() {
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
+      const t = e.target as HTMLElement;
       const isTyping =
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.tagName === 'SELECT' ||
-        target.isContentEditable;
+        t.tagName === 'INPUT' ||
+        t.tagName === 'TEXTAREA' ||
+        t.tagName === 'SELECT' ||
+        t.isContentEditable;
 
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
@@ -438,367 +376,387 @@ export default function App() {
   const currentMode = WRITING_MODES.find((m) => m.id === mode);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-dark-500 transition-colors">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {showConfetti && <Confetti />}
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-dark-500/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-teal-500 flex items-center justify-center shadow-glow">
-                <Wand2 size={18} className="text-white" />
+      {/* ─── HEADER ─── */}
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="max-w-screen-xl mx-auto px-6">
+          <div className="flex items-center justify-between h-14">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
+                <Wand2 size={16} className="text-white" />
               </div>
-              <span className="text-lg font-bold text-slate-900 dark:text-white">
-                Personacraft
-              </span>
+              <span className="text-sm font-semibold tracking-tight">Personacraft</span>
             </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
               <button
                 onClick={toggleTheme}
-                className="btn-ghost p-2.5 rounded-xl"
-                title="Toggle theme"
+                className="btn-ghost h-8 w-8 rounded-md inline-flex items-center justify-center"
               >
-                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                {isDark ? <Sun size={15} /> : <Moon size={15} />}
               </button>
               <button
                 onClick={() => setShortcutsOpen(true)}
-                className="btn-ghost p-2.5 rounded-xl"
-                title="Shortcuts"
+                className="btn-ghost h-8 w-8 rounded-md hidden sm:inline-flex items-center justify-center"
               >
-                <Keyboard size={18} />
+                <Keyboard size={15} />
               </button>
               <a
                 href="https://github.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-ghost p-2.5 rounded-xl"
+                className="btn-ghost h-8 w-8 rounded-md inline-flex items-center justify-center"
               >
-                <Github size={18} />
+                <Github size={15} />
               </a>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left: Input */}
+      {/* ─── MAIN ─── */}
+      <main className="flex-1 max-w-screen-xl mx-auto px-6 py-6 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 items-start">
+          {/* ════════════════════════════════════════
+              LEFT COLUMN — ALL CONTROLS + INPUT
+             ════════════════════════════════════════ */}
           <div className="space-y-4">
-            {/* Input Card */}
-            <div className="card p-0 overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-2">
-                  <FileText size={14} className="text-brand-500 dark:text-mint-400" />
-                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                    Input
-                  </span>
-                </div>
-                <span className={`text-xs font-medium ${overLimit ? 'text-red-500' : 'text-slate-400'}`}>
-                  {inputText.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
-                </span>
-              </div>
-
-              {/* Progress */}
-              <div className="h-0.5 bg-slate-100 dark:bg-white/5">
-                <div
-                  className={`h-full transition-all ${
-                    overLimit
-                      ? 'bg-red-500'
-                      : 'bg-gradient-to-r from-brand-500 to-teal-500'
-                  }`}
-                  style={{ width: `${charPct}%` }}
+            {/* Row 1: Mode + Model selectors */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Writing Mode</label>
+                <SelectDropdown
+                  value={mode}
+                  onChange={(v) => setMode(v as WritingMode)}
+                  options={WRITING_MODES}
+                  renderValue={(opt) => opt.label}
+                  renderOption={(opt, sel) => (
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className={`text-[13px] font-medium truncate ${sel ? 'text-brand-500' : ''}`}>
+                          {opt.label}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">{opt.description}</div>
+                      </div>
+                      {sel && <Check size={14} className="text-brand-500 shrink-0" />}
+                    </div>
+                  )}
                 />
               </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">AI Model</label>
+                <SelectDropdown
+                  value={model}
+                  onChange={setModel}
+                  options={MODELS}
+                  renderValue={(opt) => opt.label}
+                  renderOption={(opt, sel) => (
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className={`text-[13px] font-medium truncate ${sel ? 'text-teal-500' : ''}`}>
+                          {opt.label}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">{opt.strengths}</div>
+                      </div>
+                      {sel && <Check size={14} className="text-teal-500 shrink-0" />}
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
 
-              {/* Textarea */}
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Paste your text here..."
-                className="w-full h-64 p-4 bg-transparent text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none resize-none text-[15px] leading-relaxed"
-              />
-
-              {/* Error */}
-              {error && (
-                <div className="px-4 py-3 bg-red-50 dark:bg-red-500/10 border-t border-red-100 dark:border-red-500/20 flex items-center gap-2">
-                  <AlertCircle size={14} className="text-red-500 shrink-0" />
-                  <span className="text-sm text-red-600 dark:text-red-400">{error}</span>
+            {/* Row 2: Variations + Advanced toggle */}
+            <div className="flex items-end gap-3">
+              <div className="flex-1 space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Variations</label>
+                <div className="inline-flex items-center h-9 p-0.5 bg-muted rounded-md w-full">
+                  {[1, 2, 3, 5].map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => setVariationCount(v)}
+                      className={`flex-1 h-full rounded text-sm font-medium transition-colors ${
+                        variationCount === v
+                          ? 'bg-brand-500 text-white'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {v}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
+              <button
+                onClick={() => setShowControls(!showControls)}
+                className="h-9 px-3 inline-flex items-center gap-1.5 border border-border rounded-md text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors shrink-0"
+              >
+                <Settings2 size={14} />
+                Advanced
+                <ChevronDown
+                  size={13}
+                  className={`transition-transform duration-200 ${showControls ? 'rotate-180' : ''}`}
+                />
+              </button>
             </div>
 
-            {/* Mode & Model */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Writing Mode
-                </label>
-                <ModeSelector value={mode} onChange={setMode} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  AI Model
-                </label>
-                <ModelSelector value={model} onChange={setModel} />
-              </div>
-            </div>
-
-            {/* Advanced Controls Toggle */}
-            <button
-              onClick={() => setShowControls(!showControls)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:border-slate-300 dark:hover:border-white/20 transition-all"
-            >
-              <div className="flex items-center gap-2">
-                <Settings2 size={14} className="text-slate-400" />
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                  Advanced Controls
-                </span>
-              </div>
-              <ChevronDown
-                size={14}
-                className={`text-slate-400 transition-transform ${showControls ? 'rotate-180' : ''}`}
-              />
-            </button>
-
-            {/* Advanced Controls Panel */}
+            {/* Advanced Controls */}
             {showControls && (
-              <div className="card p-4 space-y-4 animate-slide-down">
+              <div className="p-3 border border-border rounded-lg bg-muted/30 animate-slide-down space-y-3">
                 <div className="grid grid-cols-3 gap-3">
-                  <ControlPill
+                  <SegmentedControl
                     label="Tense"
                     value={controls.tense}
                     onChange={(v) => setControls({ ...controls, tense: v })}
                     options={['as_is', 'present', 'past']}
                   />
-                  <ControlPill
+                  <SegmentedControl
                     label="POV"
                     value={controls.pov}
                     onChange={(v) => setControls({ ...controls, pov: v })}
                     options={['as_is', 'first', 'third']}
                   />
-                  <ControlPill
+                  <SegmentedControl
                     label="Length"
                     value={controls.length}
                     onChange={(v) => setControls({ ...controls, length: v })}
                     options={['shorter', 'same', 'longer']}
                   />
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
-                  <ControlPill
+                  <SegmentedControl
                     label="Transitions"
                     value={controls.transitions}
                     onChange={(v) => setControls({ ...controls, transitions: v })}
                     options={['off', 'light', 'strong']}
                   />
-                  <ControlPill
+                  <SegmentedControl
                     label="Vividness"
                     value={controls.vividness}
                     onChange={(v) => setControls({ ...controls, vividness: v })}
                     options={['low', 'balanced', 'high']}
                   />
                 </div>
-
-                {/* Variations */}
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                    Variations
-                  </label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 5].map((v) => (
-                      <button
-                        key={v}
-                        onClick={() => setVariationCount(v)}
-                        className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                          variationCount === v
-                            ? 'bg-brand-500 dark:bg-mint-500 text-white dark:text-dark-500'
-                            : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10'
-                        }`}
-                      >
-                        {v}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Summary Toggle */}
-                <label className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-xl cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <Zap size={14} className={controls.includeSummary ? 'text-brand-500 dark:text-mint-400' : 'text-slate-400'} />
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                      Include Summary
-                    </span>
-                  </div>
-                  <div
-                    className={`toggle-track w-10 h-6 rounded-full relative ${
-                      controls.includeSummary ? 'active' : ''
-                    }`}
-                  >
+                <div className="pt-2 border-t border-border">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span className="text-sm text-foreground">Include summary</span>
                     <div
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${
-                        controls.includeSummary ? 'left-5' : 'left-1'
+                      className={`relative w-9 h-5 rounded-full transition-colors cursor-pointer ${
+                        controls.includeSummary ? 'bg-brand-500' : 'bg-muted-foreground/20'
                       }`}
-                    />
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={controls.includeSummary}
-                    onChange={(e) => setControls({ ...controls, includeSummary: e.target.checked })}
-                    className="sr-only"
-                  />
-                </label>
+                      onClick={() =>
+                        setControls({ ...controls, includeSummary: !controls.includeSummary })
+                      }
+                    >
+                      <div
+                        className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all duration-200 ${
+                          controls.includeSummary ? 'left-[18px]' : 'left-0.5'
+                        }`}
+                      />
+                    </div>
+                  </label>
+                </div>
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button onClick={clear} className="btn-secondary flex-1 py-3 rounded-xl text-sm font-medium">
-                <Trash2 size={16} className="inline mr-2" />
+            {/* Textarea */}
+            <div className="border border-border rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <FileText size={12} />
+                  Input
+                </div>
+                <span
+                  className={`text-xs tabular-nums ${
+                    overLimit ? 'text-red-500 font-medium' : 'text-muted-foreground'
+                  }`}
+                >
+                  {inputText.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
+                </span>
+              </div>
+
+              {/* Thin progress */}
+              <div className="h-px bg-border relative">
+                <div
+                  className={`absolute inset-y-0 left-0 transition-all duration-500 ${
+                    overLimit ? 'bg-red-500' : 'bg-brand-500'
+                  }`}
+                  style={{ width: `${charPct}%`, height: '2px', top: '-0.5px' }}
+                />
+              </div>
+
+              <textarea
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Paste your text here..."
+                className="w-full min-h-[240px] p-3 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none resize-none leading-relaxed"
+              />
+
+              {error && (
+                <div className="px-3 py-2 border-t border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 flex items-center gap-2 animate-slide-up">
+                  <AlertCircle size={13} className="text-red-500 shrink-0" />
+                  <span className="text-xs text-red-600 dark:text-red-400">{error}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2">
+              <button
+                onClick={clear}
+                className="h-9 px-4 inline-flex items-center gap-1.5 border border-border rounded-md text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+              >
+                <Trash2 size={14} />
                 Clear
               </button>
               <button
                 onClick={transform}
                 disabled={loading || !inputText.trim()}
-                className="btn-primary flex-[2] py-3 rounded-xl text-sm"
+                className="flex-1 h-9 px-4 inline-flex items-center justify-center gap-1.5 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[13px] font-medium rounded-md transition-colors"
               >
                 {loading ? (
-                  <RotateCcw size={16} className="inline mr-2 animate-spin" />
+                  <RotateCcw size={14} className="animate-spin" />
                 ) : (
-                  <Sparkles size={16} className="inline mr-2" />
+                  <Sparkles size={14} />
                 )}
                 {result ? 'Regenerate' : 'Transform'}
-                {!loading && <ArrowRight size={16} className="inline ml-2" />}
+                {!loading && <ArrowRight size={14} />}
               </button>
             </div>
           </div>
 
-          {/* Right: Output */}
-          <div className="space-y-4">
-            {/* Empty State */}
+          {/* ════════════════════════════════════════
+              RIGHT COLUMN — OUTPUT ONLY
+             ════════════════════════════════════════ */}
+          <div className="lg:sticky lg:top-[72px]">
+            {/* Empty state */}
             {!result && !loading && (
-              <div className="card p-12 flex flex-col items-center justify-center min-h-[500px] border-2 border-dashed">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-100 to-teal-100 dark:from-brand-500/20 dark:to-teal-500/20 flex items-center justify-center mb-4">
-                  <Sparkles size={28} className="text-brand-500 dark:text-mint-400" />
+              <div className="border border-dashed border-border rounded-lg flex flex-col items-center justify-center min-h-[460px] p-8">
+                <div className="w-11 h-11 rounded-lg bg-muted flex items-center justify-center mb-3">
+                  <Sparkles size={20} className="text-brand-500" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
-                  Ready to transform
-                </h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-xs">
-                  Paste your text and click <span className="font-semibold text-brand-500 dark:text-mint-400">Transform</span> to see the magic.
+                <h3 className="text-sm font-semibold text-foreground mb-1">Ready to transform</h3>
+                <p className="text-xs text-muted-foreground text-center max-w-[220px] leading-relaxed">
+                  Paste your text and click{' '}
+                  <span className="text-brand-500 font-medium">Transform</span> to see the magic.
                 </p>
-                <div className="flex items-center gap-6 mt-6 text-xs text-slate-400">
-                  <div className="flex items-center gap-2">
-                    <Layers size={12} />
-                    <span>8 modes</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Zap size={12} />
-                    <span>6 models</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Copy size={12} />
-                    <span>5 variations</span>
-                  </div>
+
+                <div className="flex items-center gap-4 mt-6 text-[11px] text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Layers size={11} className="text-brand-500" /> 8 modes
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Zap size={11} className="text-teal-500" /> 6 models
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Copy size={11} className="text-pink-400" /> 5 variations
+                  </span>
+                </div>
+
+                <div className="mt-5 flex items-center gap-1.5 text-[11px] text-muted-foreground/50">
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono border border-border">
+                    ⌘
+                  </kbd>
+                  <span>+</span>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono border border-border">
+                    Enter
+                  </kbd>
+                  <span className="ml-1">to transform</span>
                 </div>
               </div>
             )}
 
             {/* Loading */}
             {loading && (
-              <div className="card p-12 flex flex-col items-center justify-center min-h-[500px]">
-                <div className="relative mb-6">
-                  <div className="w-16 h-16 rounded-full border-4 border-slate-200 dark:border-white/10" />
-                  <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-transparent border-t-brand-500 dark:border-t-mint-400 animate-spin" />
+              <div className="border border-border rounded-lg overflow-hidden min-h-[460px]">
+                <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border">
+                  <div className="relative w-3.5 h-3.5">
+                    <div className="absolute inset-0 rounded-full border-2 border-muted" />
+                    <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-brand-500 animate-spin" />
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Transforming with <span className="text-brand-500">{currentMode?.label}</span>...
+                  </span>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-1">
-                  Transforming...
-                </h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Using <span className="font-medium text-brand-500 dark:text-mint-400">{currentMode?.label}</span>
-                </p>
+                <div className="p-4">
+                  <SkeletonLoader />
+                </div>
               </div>
             )}
 
-            {/* Results */}
+            {/* Result */}
             {result && !loading && (
-              <div className="space-y-4 animate-fade-in">
-                {/* Variation Tabs */}
+              <div className="space-y-3 animate-fade-in">
+                {/* Variation tabs */}
                 {result.variations.length > 1 && (
-                  <div className="flex gap-2">
+                  <div className="inline-flex items-center h-8 p-0.5 bg-muted rounded-md">
                     {result.variations.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={() => setSelectedIdx(idx)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        className={`h-full px-3 rounded text-xs font-medium transition-colors ${
                           selectedIdx === idx
-                            ? 'bg-brand-500 dark:bg-mint-500 text-white dark:text-dark-500'
-                            : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:border-slate-300'
+                            ? 'bg-background text-foreground border border-border'
+                            : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
-                        Variation {idx + 1}
+                        V{idx + 1}
                       </button>
                     ))}
                   </div>
                 )}
 
-                {/* Result Card */}
-                <div className="card overflow-hidden border-brand-200 dark:border-mint-500/20">
-                  <div className="flex items-center justify-between px-4 py-3 bg-brand-50 dark:bg-mint-500/10 border-b border-brand-100 dark:border-mint-500/20">
+                {/* Result card */}
+                <div className="border border-border rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-accent/30">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-brand-500 dark:bg-mint-400 animate-pulse-soft" />
-                      <span className="text-xs font-semibold text-brand-700 dark:text-mint-300 uppercase tracking-wider">
+                      <div className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse-soft" />
+                      <span className="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase tracking-wide">
                         {currentMode?.label}
                       </span>
                     </div>
                     <button
                       onClick={copyPrimary}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand-600 dark:text-mint-400 hover:bg-brand-100 dark:hover:bg-mint-500/20 rounded-lg transition-colors"
+                      className="h-7 px-2 inline-flex items-center gap-1.5 text-xs font-medium text-brand-600 dark:text-brand-400 hover:bg-accent rounded transition-colors"
                     >
                       <Copy size={12} />
                       Copy
                     </button>
                   </div>
-                  <div className="p-5 text-[15px] leading-relaxed text-slate-800 dark:text-slate-100 min-h-[200px] whitespace-pre-wrap">
+                  <div className="p-4 text-sm leading-[1.8] text-foreground min-h-[200px] whitespace-pre-wrap">
                     {typewriter ? (
                       <TypewriterText text={result.variations[selectedIdx]} />
                     ) : (
                       result.variations[selectedIdx]
                     )}
                   </div>
-                  <div className="px-4 py-3 bg-slate-50 dark:bg-white/5 border-t border-slate-100 dark:border-white/5 flex items-center gap-4 text-xs text-slate-500">
+                  <div className="px-3 py-2 border-t border-border flex items-center gap-3 text-xs text-muted-foreground tabular-nums">
                     <span>
                       {result.variations[selectedIdx].split(/\s+/).filter(Boolean).length} words
                     </span>
-                    <span>•</span>
+                    <span className="text-border">•</span>
                     <span>{result.originalWordCount} original</span>
                   </div>
                 </div>
 
                 {/* Summary */}
                 {result.summary && (
-                  <div className="card p-4 border-l-4 border-l-brand-500 dark:border-l-mint-400">
+                  <div className="border border-border border-l-2 border-l-teal-500 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Zap size={14} className="text-brand-500 dark:text-mint-400" />
-                        <span className="text-xs font-semibold text-brand-600 dark:text-mint-400 uppercase tracking-wider">
+                      <div className="flex items-center gap-1.5">
+                        <Zap size={12} className="text-teal-500" />
+                        <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide">
                           Summary
                         </span>
                       </div>
                       <button
                         onClick={() => copy(result.summary!)}
-                        className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors"
+                        className="h-6 w-6 inline-flex items-center justify-center text-muted-foreground hover:text-foreground rounded transition-colors"
                       >
                         <Copy size={12} />
                       </button>
                     </div>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 italic">
+                    <p className="text-sm text-muted-foreground italic leading-relaxed">
                       "{result.summary}"
                     </p>
                   </div>
@@ -809,27 +767,25 @@ export default function App() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-white/5 mt-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1.5">
-                <Sparkles size={12} className="text-brand-500 dark:text-mint-400" />
-                Powered by Groq
-              </span>
-              <span>•</span>
+      {/* ─── FOOTER ─── */}
+      <footer className="border-t border-border mt-auto">
+        <div className="max-w-screen-xl mx-auto px-6 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Sparkles size={11} className="text-brand-500" />
+              <span>Powered by Groq</span>
+              <span className="text-border">•</span>
               <span>No credit card required</span>
             </div>
-            <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-slate-700 dark:hover:text-white transition-colors">
+            <div className="flex items-center gap-3">
+              <a href="#" className="hover:text-foreground transition-colors">
                 Docs
               </a>
-              <a href="#" className="hover:text-slate-700 dark:hover:text-white transition-colors">
+              <a href="#" className="hover:text-foreground transition-colors">
                 Privacy
               </a>
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span>Operational</span>
               </div>
             </div>

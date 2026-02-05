@@ -1,7 +1,7 @@
-// components/ShortcutsModal.tsx
+// components/ShortcutsModal.tsx — Lucide icons, zero emojis
 
 import React, { useEffect, useState } from 'react';
-import { X, Keyboard } from 'lucide-react';
+import { X, Keyboard, Sparkles, ClipboardCopy, Trash2, XCircle } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -20,7 +20,10 @@ const ShortcutsModal: React.FC<Props> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -28,43 +31,84 @@ const ShortcutsModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const shortcuts = [
-    { key: `${cmd} + Enter`, action: 'Transform text', icon: '✨' },
-    { key: `${cmd} + Shift + C`, action: 'Copy variation', icon: '📋' },
-    { key: `${cmd} + Shift + X`, action: 'Clear workspace', icon: '🗑️' },
-    { key: '?', action: 'Show shortcuts', icon: '⌨️' },
-    { key: 'Esc', action: 'Close modal', icon: '✕' },
+  const shortcuts: { key: string; action: string; icon: React.ReactNode }[] = [
+    {
+      key: `${cmd} + Enter`,
+      action: 'Transform text',
+      icon: <Sparkles size={14} className="text-brand-500" />,
+    },
+    {
+      key: `${cmd} + Shift + C`,
+      action: 'Copy variation',
+      icon: <ClipboardCopy size={14} className="text-teal-500" />,
+    },
+    {
+      key: `${cmd} + Shift + X`,
+      action: 'Clear workspace',
+      icon: <Trash2 size={14} className="text-pink-500" />,
+    },
+    {
+      key: '?',
+      action: 'Show shortcuts',
+      icon: <Keyboard size={14} className="text-sunny-500" />,
+    },
+    {
+      key: 'Esc',
+      action: 'Close modal',
+      icon: <XCircle size={14} className="text-muted-foreground" />,
+    },
   ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-navy-800/50 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-      
-      <div className="relative w-full max-w-md bg-white dark:bg-navy-800 border-2 border-teal-500 rounded-xl animate-slide-up">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-navy-200 dark:border-navy-600">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-lime-400 flex items-center justify-center">
-              <Keyboard size={16} className="text-navy-800" />
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 bg-black/40 dark:bg-black/60 animate-fade-in"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="relative w-full max-w-sm bg-background border border-border rounded-lg animate-scale-in overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-md bg-muted flex items-center justify-center">
+              <Keyboard size={14} className="text-muted-foreground" />
             </div>
-            <h2 className="font-display text-base font-bold text-navy-800 dark:text-white">Keyboard Shortcuts</h2>
+            <h2 className="text-sm font-semibold text-foreground">Keyboard Shortcuts</h2>
           </div>
-          <button onClick={onClose} className="p-2 text-navy-500 hover:text-navy-800 dark:hover:text-white hover:bg-navy-100 dark:hover:bg-navy-700 rounded-lg transition-colors">
-            <X size={18} />
+          <button
+            onClick={onClose}
+            className="btn-ghost h-7 w-7 rounded-md inline-flex items-center justify-center"
+          >
+            <X size={15} />
           </button>
         </div>
 
-        <div className="p-4 space-y-2">
+        {/* Shortcuts list */}
+        <div className="p-2 space-y-0.5">
           {shortcuts.map((s) => (
-            <div key={s.action} className="flex items-center justify-between p-3 rounded-lg bg-navy-50 dark:bg-navy-700/50 hover:bg-navy-100 dark:hover:bg-navy-700 transition-colors group">
-              <div className="flex items-center gap-3">
-                <span className="text-base">{s.icon}</span>
-                <span className="text-sm font-medium text-navy-700 dark:text-navy-200 group-hover:text-navy-900 dark:group-hover:text-white transition-colors">{s.action}</span>
+            <div
+              key={s.action}
+              className="flex items-center justify-between px-2.5 py-2.5 rounded-md hover:bg-accent/50 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-5 flex items-center justify-center shrink-0">
+                  {s.icon}
+                </div>
+                <span className="text-[13px] text-muted-foreground group-hover:text-foreground transition-colors">
+                  {s.action}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 {s.key.split(' + ').map((k, i, arr) => (
                   <React.Fragment key={k}>
-                    <kbd className="px-2 py-1 bg-white dark:bg-navy-600 border border-navy-200 dark:border-navy-500 rounded-md font-mono text-xs text-teal-600 dark:text-lime-400 min-w-[28px] text-center">{k}</kbd>
-                    {i < arr.length - 1 && <span className="text-navy-400 text-xs">+</span>}
+                    <kbd className="h-5 min-w-[22px] px-1.5 inline-flex items-center justify-center bg-muted border border-border rounded text-[10px] font-mono font-medium text-muted-foreground">
+                      {k}
+                    </kbd>
+                    {i < arr.length - 1 && (
+                      <span className="text-muted-foreground/40 text-[10px]">+</span>
+                    )}
                   </React.Fragment>
                 ))}
               </div>
@@ -72,9 +116,14 @@ const ShortcutsModal: React.FC<Props> = ({ isOpen, onClose }) => {
           ))}
         </div>
 
-        <div className="px-6 py-4 border-t border-navy-200 dark:border-navy-600 bg-navy-50 dark:bg-navy-900/50 rounded-b-xl">
-          <p className="text-[11px] text-navy-500 dark:text-navy-400 text-center">
-            Press <kbd className="px-1.5 py-0.5 bg-white dark:bg-navy-600 border border-navy-200 dark:border-navy-500 rounded text-teal-600 dark:text-lime-400 font-mono text-[10px]">?</kbd> anytime to view shortcuts
+        {/* Footer */}
+        <div className="px-4 py-2.5 border-t border-border">
+          <p className="text-[11px] text-muted-foreground/60 text-center">
+            Press{' '}
+            <kbd className="px-1 py-px bg-muted border border-border rounded text-[10px] font-mono text-muted-foreground">
+              ?
+            </kbd>{' '}
+            anytime to view
           </p>
         </div>
       </div>
